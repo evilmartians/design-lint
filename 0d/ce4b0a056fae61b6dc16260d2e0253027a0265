@@ -1,0 +1,21 @@
+.github/workflows/ci.yml
+  s_0c23c96fdccb27::t_958ec13afa7784 1-38
+.github/workflows/release.yml
+  s_0c23c96fdccb27::t_5d8634c49d5cb9 1-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0dce4b0a056fae61b6dc16260d2e0253027a0265",
+  "prompts": {},
+  "sessions": {
+    "s_0c23c96fdccb27": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "baf7516e-61ce-4044-b816-74e94c94f43a",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
