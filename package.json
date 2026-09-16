@@ -1,5 +1,5 @@
 {
-  "name": "@evil-martians/design-lint",
+  "name": "@evilmartians/design-lint",
   "version": "0.1.0",
   "type": "module",
   "description": "Design-token lint rules for Tailwind v4 codebases, for Oxlint and ESLint",
@@ -14,9 +14,12 @@
     "vitest": "^3.2.4"
   },
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/evil-martians/design-lint.git"
+    "url": "git+https://github.com/evilmartians/design-lint.git"
   },
   "keywords": [
     "oxlint",

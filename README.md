@@ -1,11 +1,11 @@
-# @evil-martians/design-lint
+# @evilmartians/design-lint
 
 Design-token lint rules for Tailwind v4 projects using [Oxlint](https://oxc.rs/docs/guide/usage/linter).
 
 The rules keep color decisions inside your design system. They catch hard-coded colors, Tailwind palette colors, local dark-mode branches, invalid token names, and component color overrides.
 
 ```sh
-npm install --save-dev @evil-martians/design-lint oxlint
+npm install --save-dev @evilmartians/design-lint oxlint
 ```
 
 ## Setup
@@ -14,7 +14,7 @@ Create `oxlint.config.ts`:
 
 ```ts
 import { defineConfig } from "oxlint";
-import { designLint } from "@evil-martians/design-lint/preset";
+import { designLint } from "@evilmartians/design-lint/preset";
 
 export default defineConfig(
   await designLint({
@@ -102,14 +102,14 @@ The rules can also run in ESLint v9 flat config. Resolve the design system first
 
 ```js
 // eslint.config.mjs
-import { designLint } from "@evil-martians/design-lint/preset";
+import { designLint } from "@evilmartians/design-lint/preset";
 
 const design = await designLint({
   tokenFiles: ["src/styles.css"],
   componentSources: ["@/components/ui/*"],
 });
 
-const designPlugin = (await import("@evil-martians/design-lint/oxlint")).default;
+const designPlugin = (await import("@evilmartians/design-lint/oxlint")).default;
 
 export default [
   {

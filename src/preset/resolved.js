@@ -28,7 +28,7 @@ export function publish(inputs) {
 export function consume() {
   if (!resolved) {
     throw new Error(
-      "design-lint: the plugin was loaded without a resolved design system. `@evil-martians/design-lint/oxlint` is loaded by `designLint()`, which resolves one first — list it through that factory in oxlint.config.ts rather than naming it in `jsPlugins` by hand.",
+      "design-lint: the plugin was loaded without a resolved design system. `@evilmartians/design-lint/oxlint` is loaded by `designLint()`, which resolves one first — list it through that factory in oxlint.config.ts rather than naming it in `jsPlugins` by hand.",
     );
   }
   return resolved;

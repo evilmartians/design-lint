@@ -82,7 +82,7 @@ Install from a tarball:
 ```
 npm pack --pack-destination .pack
 # then, in the project:
-npm install --save-dev /path/to/design-lint/.pack/evil-martians-design-lint-0.1.0.tgz
+npm install --save-dev /path/to/design-lint/.pack/evilmartians-design-lint-0.1.0.tgz
 ```
 
 Never `npm install ../design-lint` or `npm link`. A symlinked install resolves

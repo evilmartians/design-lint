@@ -38,7 +38,7 @@ const RULE_IDS = [
  * ```ts
  * // oxlint.config.ts
  * import { defineConfig } from "oxlint";
- * import { designLint } from "@evil-martians/design-lint/preset";
+ * import { designLint } from "@evilmartians/design-lint/preset";
  *
  * export default defineConfig(
  *   await designLint({
@@ -121,7 +121,7 @@ export async function designLint({
   const ids = RULE_IDS.filter((id) => id !== "no-component-color-override" || watching);
 
   return {
-    jsPlugins: ["@evil-martians/design-lint/oxlint"],
+    jsPlugins: ["@evilmartians/design-lint/oxlint"],
     rules: {
       ...Object.fromEntries(ids.map((id) => [`${namespace}/${id}`, severity])),
       // The options a consumer's own layout decides. Everything else a rule needs it carries
