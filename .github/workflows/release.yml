@@ -1,0 +1,61 @@
+name: Release
+
+# Publishing is driven by the tag. Bump the version, write the CHANGELOG entry,
+# then `git tag v0.1.1 && git push origin v0.1.1`.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+  # Lets the job request an OIDC token. It grants no write access to the
+  # repository; it is what npm exchanges for a short-lived publish credential.
+  id-token: write
+
+jobs:
+  release:
+    name: Publish to npm
+    # Trusted publishing works only on GitHub-hosted runners. A self-hosted
+    # runner cannot complete the OIDC exchange.
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - uses: actions/setup-node@v7.0.0
+        with:
+          # Trusted publishing needs npm >= 11.5.1. The runner's preinstalled npm
+          # is 10.9.8, below that floor; Node 24 bundles npm 11.19.x, which clears
+          # it. Do not replace this with `npm i -g npm@latest` — that installs
+          # npm 12, which blocks dependency lifecycle scripts by default and
+          # would change how `npm ci` resolves this tree.
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+          # No dependency cache: this job runs once per release, and npm's own
+          # published example leaves the cache off for the publishing step.
+
+      # The tag is this workflow's only input, so it has to agree with the version
+      # actually being published. A v0.2.0 tag on a tree that still says 0.1.0
+      # would publish 0.1.0 under the wrong name, and a version cannot be reused
+      # once it is on the registry.
+      - name: Verify tag matches package.json version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg="$(node -p 'require("./package.json").version')"
+          if [ "$tag" != "$pkg" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match package.json version ${pkg}"
+            exit 1
+          fi
+          echo "publishing ${pkg}"
+
+      - run: npm ci
+
+      # The tag does not prove the tree was ever green. Publishing is final, so
+      # the suite runs here too rather than trusting the CI run on the branch.
+      - run: npm test
+
+      # No --provenance: trusted publishing generates the attestation on its own.
+      # No NODE_AUTH_TOKEN: OIDC does not use one.
+      # access is set through publishConfig in package.json.
+      - run: npm publish
