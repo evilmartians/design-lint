@@ -1,0 +1,30 @@
+src/preset/index.js
+  s_0c23c96fdccb27::t_676466f20d4458 41,124
+CONTRIBUTING.md
+  s_0c23c96fdccb27::t_676466f20d4458 85
+src/preset/resolved.js
+  s_0c23c96fdccb27::t_676466f20d4458 31
+package.json
+  s_0c23c96fdccb27::t_676466f20d4458 2,22
+  s_0c23c96fdccb27::t_0fbd38699de53c 17-19
+README.md
+  s_0c23c96fdccb27::t_676466f20d4458 1,8,17,105,112
+package-lock.json
+  s_0c23c96fdccb27::t_81567d40fdb5bd 2,8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "7d6fa4180409d4f4945603fa1bf558d43f89216b",
+  "prompts": {},
+  "sessions": {
+    "s_0c23c96fdccb27": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "baf7516e-61ce-4044-b816-74e94c94f43a",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
