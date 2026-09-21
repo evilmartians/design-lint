@@ -1,0 +1,48 @@
+CHANGELOG.md
+  s_c2f44b13495444::t_8fa517a2bb5a99 3
+  s_c2f44b13495444::t_9515865d749ca9 4-5,7-8
+  s_c2f44b13495444::t_63af86a7cb5340 6
+src/cli.js
+  s_c2f44b13495444::t_a4035230a3ec64 1-19,23,25-99,103-133
+  s_c2f44b13495444::t_20ab590c4fbf76 20-22,24
+  s_c2f44b13495444::t_270e6bb2f87ee8 100-102
+README.md
+  s_c2f44b13495444::t_63af86a7cb5340 90,100
+  s_c2f44b13495444::t_9515865d749ca9 76-89,91-99,101-104
+package.json
+  s_c2f44b13495444::t_8fa517a2bb5a99 3
+  s_c2f44b13495444::t_1b8c499df98c91 6-8
+CONTRIBUTING.md
+  s_c2f44b13495444::t_9515865d749ca9 15
+src/report/index.js
+  s_c2f44b13495444::t_f507d8ba45c81a 41,97
+  s_c2f44b13495444::t_b3f6ea9ffcb48b 38,46,65
+  s_c2f44b13495444::t_2cfe15d15097d8 95-96
+  s_c2f44b13495444::t_bbbfceda48136c 1-37,39-40,42-45,47-64,66-94,98-116
+src/report/directives.js
+  s_c2f44b13495444::t_2dae8fad774ed6 1-46
+test/report/report.test.js
+  s_c2f44b13495444::t_0d9249dbc9fb77 1-105,108-119,121-134,147-148,152,156,159-168,170,172-176,179-187
+  s_c2f44b13495444::t_63af86a7cb5340 107,120,171
+  s_c2f44b13495444::t_20ab590c4fbf76 149-151,169
+  s_c2f44b13495444::t_2b9fca18707226 106
+  s_c2f44b13495444::t_270e6bb2f87ee8 135-146,153-155,157-158,177-178
+package-lock.json
+  s_c2f44b13495444::t_e06cc2130f4634 3,9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1bad8a4380c3b461f60937163857c0ea3c747725",
+  "prompts": {},
+  "sessions": {
+    "s_c2f44b13495444": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7dbe63c7-cb51-4c94-b1f8-2c54e1ab9914",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
