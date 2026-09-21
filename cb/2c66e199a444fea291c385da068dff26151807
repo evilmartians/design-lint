@@ -1,0 +1,19 @@
+README.md
+  s_c2f44b13495444::t_71a15e2eefd3ae 81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "cb2c66e199a444fea291c385da068dff26151807",
+  "prompts": {},
+  "sessions": {
+    "s_c2f44b13495444": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7dbe63c7-cb51-4c94-b1f8-2c54e1ab9914",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
