@@ -78,7 +78,7 @@ When you restate a rule, you replace the options the preset gave it. If you only
 To see how much of the design system a project leaves unchecked, run this from where you run `oxlint`:
 
 ```sh
-npx design-lint report
+npx @evilmartians/design-lint report
 ```
 
 ```txt
