@@ -73,6 +73,35 @@ export default defineConfig({
 
 When you restate a rule, you replace the options the preset gave it. If you only want to change severity, keep any required options with it. This matters most for `no-component-color-override`, because `componentSources` has no safe default.
 
+## Integration report
+
+To see how much of the design system a project leaves unchecked, run this from where you run `oxlint`:
+
+```sh
+npx design-lint report
+```
+
+```txt
+design-lint report — oxlint.config.ts
+
+Disabled rules (1 of 9)
+  no-opacity-modifier  off
+
+Disable comments (7)
+  no-raw-color             4
+  no-spectral-color        2
+  (all rules, none named)  1
+
+Ignored paths (ignorePatterns)
+  src/legacy/**
+```
+
+- **Disabled rules** are rules turned `off` in your config, or never turned on. For example, `componentSources: []` leaves out `no-component-color-override`.
+- **Disable comments** is the number of `oxlint-disable*` and `eslint-disable*` comments that silence design rules, broken down by rule. A comment that names no rule silences every rule, so it gets its own line. A comment that names two rules counts once in the total and once under each rule. Only files Oxlint lints are scanned.
+- **Ignored paths** are the config's `ignorePatterns`.
+
+It reads `oxlint.config.ts` the way Oxlint finds it. Pass `--config <file>` and paths to match how you run `oxlint`.
+
 ## Limits
 
 These rules are intentionally static. They do not run your app or follow values across files.

@@ -1,8 +1,11 @@
 {
   "name": "@evilmartians/design-lint",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Design-token lint rules for Tailwind v4 codebases, for Oxlint and ESLint",
+  "bin": {
+    "design-lint": "./src/cli.js"
+  },
   "scripts": {
     "test": "vitest run",
     "generate:colors": "node scripts/generate-color-names.mjs"

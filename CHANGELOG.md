@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+- `design-lint report` prints what a project's setup leaves unchecked: design rules that
+  are off or never turned on, disable comments that silence them, and the config's
+  `ignorePatterns`.
+
 ## 0.1.0
 
 First release. Nine rules, each with a guide in `docs/rules/` and a contract in

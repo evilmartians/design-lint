@@ -12,6 +12,7 @@ npm test
 | `src/preset/` | `designLint()`, the factory a consumer calls from `oxlint.config.ts`. It performs the package's one filesystem read: it loads the consumer's token stylesheets, resolves the Tailwind design system and the token set, and hands them to the plugin. |
 | `src/oxlint.js` | The plugin Oxlint loads through `jsPlugins`. It binds what the factory resolved to the rules that need it. |
 | `src/rules/` | The nine rules. |
+| `src/cli.js`, `src/report/` | `design-lint report`: reads the consumer's Oxlint config, asks Oxlint which files it lints, and counts what is switched off. |
 | `src/extract/` | Class-string extraction. A broad sweep of every string in the file for the token rules; a precise walk of one element's `className` for the JSX rules. |
 | `src/policy/` | What several rules share: variant parsing, the class tokenizer, colour matching, and the questions asked of the design system and the token set. Exported as `/policy`. |
 | `docs/rules/` | One guide per rule, written for the people whose code it reports. Shipped. |
