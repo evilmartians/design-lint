@@ -1,0 +1,36 @@
+test/policy/color.test.js
+  s_95f0ee1dba5e7f::t_e72b6ed293a281 165-193
+package.json
+  s_95f0ee1dba5e7f::t_12383c60fbf5d3 3
+docs/rules/no-raw-color.md
+  s_95f0ee1dba5e7f::t_5d3cbcfdbbced8 61-67
+test/contracts/no-raw-color.js
+  s_95f0ee1dba5e7f::t_10b374013f83c4 638
+  s_95f0ee1dba5e7f::t_8f5263a995b9c4 610-637,639-641
+CHANGELOG.md
+  s_95f0ee1dba5e7f::t_a731cf918ae980 3-10
+src/policy/color.js
+  s_95f0ee1dba5e7f::t_0914b3973a2c19 221
+  s_95f0ee1dba5e7f::t_b804f05fa2f228 308-342
+  s_95f0ee1dba5e7f::t_4107d28b4135f9 41-44
+  s_95f0ee1dba5e7f::t_27e9e1e446846c 254-265
+  s_95f0ee1dba5e7f::t_7c9e59f7656919 78-80
+package-lock.json
+  s_95f0ee1dba5e7f::t_db2599554e7cc7 3,9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "fcc8677770087fc5ed2a5097b6af7c3621552fdc",
+  "prompts": {},
+  "sessions": {
+    "s_95f0ee1dba5e7f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8eeea952-966d-48f8-9244-296f58fe0778",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
