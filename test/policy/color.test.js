@@ -162,6 +162,35 @@ describe("rawColorsIn — a value known to carry a colour", () => {
     });
   });
 
+  describe("relative colour syntax, which composes too", () => {
+    // `from` is what turns a colour function's first argument from a number into a colour,
+    // so the call derives from a token as surely as `color-mix()` does. Without this the
+    // whole set of colour functions is unconditional and every derived hover shade reports.
+    it("is not a colour when it derives from a reference", () => {
+      expect(rawColorsIn("oklch(from var(--accent) calc(l - 0.01) c h)")).toEqual([]);
+      expect(rawColorsIn("rgb(from var(--brand) r g b / 0.5)")).toEqual([]);
+      expect(rawColorsIn("color(from var(--brand) srgb r g b)")).toEqual([]);
+      expect(rawColorsIn("oklch(from color-mix(in oklch, var(--a), var(--b)) l c h)")).toEqual([]);
+    });
+
+    it("is a colour when it derives from a literal, and names the whole call", () => {
+      expect(rawColorsIn("oklch(from #f00 l c h)")).toEqual(["oklch(from #f00 l c h)"]);
+      expect(rawColorsIn("oklch(from red calc(l - 0.01) c h)")).toEqual([
+        "oklch(from red calc(l - 0.01) c h)",
+      ]);
+      expect(rawColorsIn("oklch(from color-mix(in oklch, #fff, var(--b)) l c h)")).toHaveLength(1);
+    });
+
+    // The channels are numbers and single letters. No named colour is one letter long, so
+    // there is nothing there to read as a colour — but only the origin is scanned, so the
+    // question never arises.
+    it("reads the origin only, and only when `from` is there", () => {
+      expect(rawColorsIn("oklch(0.7 0.15 30)")).toEqual(["oklch(0.7 0.15 30)"]);
+      expect(rawColorsIn("OKLCH(FROM var(--a) l c h)")).toEqual([]);
+      expect(rawColorsIn("oklch(from var(--a) l c h / 0)")).toEqual([]);
+    });
+  });
+
   describe("other functions, which are transparent", () => {
     // A gradient is not a colour and is full of them. This is where a property-name check
     // loses a colour it never had a chance to see.

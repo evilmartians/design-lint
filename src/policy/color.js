@@ -38,6 +38,10 @@
  *   one, so `light-dark(#000,#fff)` reports and
  *   `light-dark(var(--a),var(--b))` does not. The call itself, tokens or not, is
  *   `no-dark-variant`'s to report.
+ * - **`from` makes a colour function compose too.** In relative colour syntax the first
+ *   argument is a colour rather than a number, so `oklch(from var(--accent) calc(l - 0.01) c h)`
+ *   derives from a token and is a reference, exactly as `color-mix(in oklch, var(--accent), …)`
+ *   is, while `oklch(from #f00 l c h)` reports.
  * - **Other functions are transparent.** `linear-gradient(#fff, #000)` is not itself a
  *   colour literal, but it contains two, and a gradient is where a colour most often hides
  *   from a property-name check.
@@ -71,8 +75,9 @@ export const DEFAULT_IGNORED_VALUES = [
 ];
 
 /**
- * Functions that *are* a colour, whatever they are handed. Every one of them exists only to
- * produce a colour, so the call is the literal and its arguments are numbers.
+ * Functions that *are* a colour. Every one of them exists only to produce a colour, so the
+ * call is the literal and its arguments are numbers — except under relative colour syntax,
+ * where `from` puts a colour in front of the numbers and {@link relativeOrigin} finds it.
  */
 const COLOR_FUNCTIONS = new Set([
   "rgb",
@@ -213,8 +218,7 @@ function scan(value, state) {
       continue;
     }
 
-    let end = i;
-    while (end < value.length && !SEPARATORS.has(value[end])) end++;
+    const end = endOfWord(value, i);
     const word = value.slice(i, end);
 
     // A word standing immediately against `(` is a function name. "Immediately" is what
@@ -247,7 +251,18 @@ function pushCall(hits, name, args, whole, state) {
   if (COLOR_FUNCTIONS.has(lower)) {
     // A zero alpha is `transparent` spelled another way: nothing is painted, and no token
     // could replace it, which is why `transparent` itself is allowed.
-    if (!ZERO.test(alphaOf(args) ?? "")) hits.push(whole);
+    if (ZERO.test(alphaOf(args) ?? "")) return;
+
+    // Relative colour syntax composes, so the call is whatever its origin is. Only the
+    // origin is scanned: the channels after it are numbers and single-letter keywords, and
+    // reading them as values would be asking the question this branch exists to avoid.
+    const origin = relativeOrigin(args);
+    if (origin !== null) {
+      if (scan(origin, state).length > 0) hits.push(whole);
+      return;
+    }
+
+    hits.push(whole);
     return;
   }
 
@@ -288,6 +303,41 @@ function hexColor(word) {
   if (digits.length === 4 && digits[3] === "0") return null;
   if (digits.length === 8 && digits.endsWith("00")) return null;
   return word;
+}
+
+/**
+ * The origin colour of a relative colour — the argument between `from` and the channels —
+ * or `null` when these arguments are not relative colour syntax.
+ *
+ * `oklch(from var(--accent) calc(l - 0.01) c h)` gives `var(--accent)` and
+ * `oklch(0.7 0.15 30)` gives `null`. The origin is a single token, a call or a word, so it
+ * ends where its balanced call does or where the next separator is; the channels that
+ * follow are none of this function's business.
+ */
+function relativeOrigin(args) {
+  let i = firstWord(args, 0);
+  const keywordEnd = endOfWord(args, i);
+  if (args.slice(i, keywordEnd).toLowerCase() !== "from") return null;
+
+  i = firstWord(args, keywordEnd);
+  if (i >= args.length) return null;
+
+  const end = endOfWord(args, i);
+  return args[end] === "(" ? args.slice(i, endOfCall(args, end)) : args.slice(i, end);
+}
+
+/** The index of the next character that begins a word, or the end of the string. */
+function firstWord(value, start) {
+  let i = start;
+  while (i < value.length && SEPARATORS.has(value[i])) i++;
+  return i;
+}
+
+/** The index just past the word beginning at `start`. */
+function endOfWord(value, start) {
+  let i = start;
+  while (i < value.length && !SEPARATORS.has(value[i])) i++;
+  return i;
 }
 
 /** An alpha of zero, written any way CSS allows: `0`, `0.0`, `.0`, `0%`. */

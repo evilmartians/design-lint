@@ -607,6 +607,38 @@ export default {
       code: `<div className="bg-[color-mix(in_oklch,var(--color-primary)_50%,transparent)]" />`,
     },
 
+    // Relative colour syntax. `from` puts a colour where a colour function otherwise takes
+    // numbers, so the call derives from whatever it is handed: a token in, a reference out —
+    // the same reading `color-mix()` already gets, and for the same reason. A literal origin
+    // is still a literal, and one report names the whole call, because the author wrote a
+    // single value and has a single edit to make.
+    {
+      kind: "allowed",
+      group: "Relative color syntax",
+      code: `<div className="hover:bg-[oklch(from_var(--color-accent)_calc(l_-_0.01)_c_h)]" />`,
+    },
+    {
+      kind: "allowed",
+      group: "Relative color syntax",
+      code: `<div style={{ color: "rgb(from var(--color-primary) r g b / 0.5)" }} />`,
+    },
+    {
+      kind: "caught",
+      group: "Relative color syntax",
+      code: `<div className="bg-[oklch(from_#f00_l_c_h)]" />`,
+      reports: [
+        { id: "rawColorValue", line: 1, column: 17, endLine: 1, endColumn: 44 },
+      ],
+    },
+    {
+      kind: "caught",
+      group: "Relative color syntax",
+      code: `<rect fill="oklch(from red calc(l - 0.01) c h)" />`,
+      reports: [
+        { id: "rawColorValue", line: 1, column: 7, endLine: 1, endColumn: 48 },
+      ],
+    },
+
     // Fully transparent literals. A colour with a zero alpha is `transparent` spelled another
     // way: it paints nothing, and no token could replace it. Any alpha above zero is a colour.
     {

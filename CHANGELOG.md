@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.2
+
+- `no-raw-color` no longer reports a color derived from a token with relative color syntax.
+  `oklch(from var(--color-accent) calc(l - 0.01) c h)` reads `--color-accent` and adjusts a
+  channel, so it is a reference, exactly as `color-mix(in oklch, var(--color-accent), …)`
+  already was. A relative color derived from a literal — `oklch(from #f00 l c h)` — still
+  reports, and names the whole call.
+
 ## 0.1.1
 
 - `design-lint report` prints what a project's setup leaves unchecked: design rules that

@@ -58,6 +58,13 @@ Token references are allowed.
 <path fill="var(--color-primary)" />
 ```
 
+A color derived from a token is a reference too, whether it is derived with `color-mix()` or with relative color syntax. Derive it from a literal and it is a literal again.
+
+```tsx
+<div className="hover:bg-[oklch(from_var(--color-accent)_calc(l_-_0.01)_c_h)]" />
+<div className="bg-[color-mix(in_oklch,var(--color-primary)_50%,transparent)]" />
+```
+
 The values `currentColor`, `transparent`, and CSS-wide cascade keywords such as `inherit` are allowed. So is any color with a zero alpha, such as `#0000` or `rgba(0, 0, 0, 0)`, which is `transparent` written another way.
 
 ```tsx
