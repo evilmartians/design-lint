@@ -30,7 +30,29 @@ export default defineConfig(
 
 If the project has no component library, pass `componentSources: []`. That turns off `no-component-color-override`.
 
-> Do not keep both `oxlint.config.ts` and `.oxlintrc.json`. Oxlint auto-discovers the TypeScript config.
+### Keeping an existing `.oxlintrc.json`
+
+Oxlint refuses to start when `oxlint.config.ts` and `.oxlintrc.json` sit in the same directory, and the setup above needs the TypeScript config. To keep your JSON config as it is, rename it (to `oxlint.base.json`, say) and merge it in:
+
+```ts
+import { defineConfig, type OxlintConfig } from "oxlint";
+import { designLint } from "@evilmartians/design-lint/preset";
+import json from "./oxlint.base.json" with { type: "json" };
+
+const base = json as OxlintConfig;
+const design = await designLint({
+  tokenFiles: ["src/styles.css"],
+  componentSources: ["@/components/ui/*"],
+});
+
+export default defineConfig({
+  ...base,
+  jsPlugins: [...(base.jsPlugins ?? []), ...design.jsPlugins],
+  rules: { ...base.rules, ...design.rules },
+});
+```
+
+Merge it rather than passing it through `extends`: Oxlint rejects relative `jsPlugins` paths in a config that arrives through `extends`.
 
 Example output:
 
@@ -117,9 +139,9 @@ Known limits:
 
 - Node 22.18+ or 23.6+
 - Oxlint 1.82+
-- Tailwind v4
+- Tailwind 4.1.18+
 
-The package uses `@tailwindcss/node` to read the same design system your Tailwind build uses. If your project already uses Tailwind through Vite, PostCSS, or the Tailwind CLI, it is usually already installed. Otherwise add it:
+The package uses `@tailwindcss/node` to read the same design system your Tailwind build uses. It takes the copy your project resolves, so installing a newer one alongside an older Tailwind does not help: upgrade the project's Tailwind. If your project already uses Tailwind through Vite, PostCSS, or the Tailwind CLI, it is usually already installed. Otherwise add it:
 
 ```sh
 npm install --save-dev @tailwindcss/node

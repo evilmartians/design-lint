@@ -23,6 +23,9 @@ import { pathToFileURL } from "node:url";
 
 const ENGINE = "@tailwindcss/node";
 
+/** The first Tailwind whose design system has every method `./design-system.js` calls. */
+const MIN_TAILWIND = "4.1.18";
+
 /**
  * Packages that carry the engine as their own dependency. Under a strict pnpm layout the
  * engine is never hoisted — it sits in `node_modules/.pnpm`, reachable only from the build
@@ -53,7 +56,15 @@ export async function loadDesignSystem(entryCss, { base = process.cwd() } = {}) 
       `design-lint: ${ENGINE} ${engine.version} at ${engine.entry} does not provide __unstable__loadDesignSystem. It is an unstable API; this package is tested against 4.x.`,
     );
   }
-  return load(entryCss, { base });
+  const designSystem = await load(entryCss, { base });
+  // An engine that loads is not yet one that works: `candidatesToAst` arrived in 4.1.18, and
+  // below that every rule throws the same TypeError on every file. Refuse once, here.
+  if (typeof designSystem?.candidatesToAst !== "function") {
+    throw new Error(
+      `design-lint: ${ENGINE} ${engine.version ?? "(unknown version)"} at ${engine.entry} is too old; design-lint needs Tailwind ${MIN_TAILWIND} or later. It runs the engine your build runs, so upgrade tailwindcss and ${ENGINE} in the project.`,
+    );
+  }
+  return designSystem;
 }
 
 /**

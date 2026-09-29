@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, it } from "vitest";
 
-import { resolveTailwindEngine } from "../../src/policy/load.js";
+import { loadDesignSystem, resolveTailwindEngine } from "../../src/policy/load.js";
 import { designLint } from "../../src/preset/index.js";
 import { consume } from "../../src/preset/resolved.js";
 
@@ -44,6 +44,23 @@ describe("resolveTailwindEngine", () => {
 
     expect(() => createRequire(join(root, "noop.js")).resolve("@tailwindcss/node")).toThrow();
     expect(resolveTailwindEngine(root).entry).toBe(REAL_ENGINE);
+  });
+
+  it("refuses to start on an engine older than the design-system API it needs", async () => {
+    // `candidatesToAst` arrived in Tailwind 4.1.18. Without this check an older engine loads
+    // fine and every rule then throws the same TypeError on every file it lints.
+    const root = project();
+    const engine = join(root, "node_modules", "@tailwindcss", "node");
+    mkdirSync(engine, { recursive: true });
+    writeFileSync(
+      join(engine, "package.json"),
+      '{ "name": "@tailwindcss/node", "version": "4.1.17", "type": "module", "main": "index.js" }',
+    );
+    writeFileSync(join(engine, "index.js"), "export const __unstable__loadDesignSystem = async () => ({});\n");
+
+    await expect(loadDesignSystem('@import "tailwindcss";', { base: root })).rejects.toThrow(
+      /@tailwindcss\/node 4\.1\.17 .*4\.1\.18 or later/,
+    );
   });
 
   it("refuses to guess when there is no engine at all", () => {

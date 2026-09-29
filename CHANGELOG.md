@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.3
+
+- Tailwind 4.1.18 is the minimum, and the `@tailwindcss/node` peer range says so. The rules
+  call a design-system method that 4.1.18 introduced, so on 4.1.17 and earlier every file
+  failed with `designSystem.candidatesToAst is not a function`. An older engine now stops
+  the run once, with an error naming the version it found.
+- `@evilmartians/design-lint/preset` ships type declarations, so a strict
+  `oxlint.config.ts` no longer reports TS7016 on the import.
+- The README shows how to keep an existing `.oxlintrc.json` alongside the preset.
+
 ## 0.1.2
 
 - `no-raw-color` no longer reports a color derived from a token with relative color syntax.
