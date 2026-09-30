@@ -36,14 +36,15 @@ export function bindResolved(rule, resolved) {
     ...rule,
     create: (context) =>
       rule.create(
-        // A proxy rather than a copy: `context` carries non-configurable properties and
-        // accessors whose receiver must stay the real context, so everything but `options`
-        // is read straight off the target.
-        new Proxy(context, {
-          get: (target, key) =>
+        // A proxy rather than a copy: `context` carries accessors whose receiver must stay
+        // the real context, so everything but `options` is read straight off it. The proxy
+        // wraps an empty object, not `context`: ESLint freezes the context, and a proxy may
+        // not answer for a frozen target's `options` with anything but its own array.
+        new Proxy({}, {
+          get: (_target, key) =>
             key === "options"
-              ? [{ ...resolved, ...(target.options[0] ?? {}) }]
-              : Reflect.get(target, key),
+              ? [{ ...resolved, ...(context.options[0] ?? {}) }]
+              : Reflect.get(context, key, context),
         }),
       ),
   };

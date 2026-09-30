@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4
+
+- The rules load under ESLint 9. ESLint freezes the context it hands a rule, and every rule
+  that reads the resolved design system threw on load with `'get' on proxy: property
+  'options' is a read-only and non-configurable data property`. Oxlint was not affected.
+
 ## 0.1.3
 
 - Tailwind 4.1.18 is the minimum, and the `@tailwindcss/node` peer range says so. The rules

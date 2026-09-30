@@ -149,20 +149,25 @@ npm install --save-dev @tailwindcss/node
 
 ## ESLint
 
-The rules can also run in ESLint v9 flat config. Resolve the design system first, then import the plugin:
+The rules can also run in an ESLint v9 flat config. Add three things to your existing `eslint.config.mjs`:
 
 ```js
 // eslint.config.mjs
 import { designLint } from "@evilmartians/design-lint/preset";
 
+// 1. Resolve the design system.
 const design = await designLint({
   tokenFiles: ["src/styles.css"],
   componentSources: ["@/components/ui/*"],
 });
 
+// 2. Then load the plugin.
 const designPlugin = (await import("@evilmartians/design-lint/oxlint")).default;
 
 export default [
+  // ...your existing config
+
+  // 3. Turn the rules on for your component files.
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
     plugins: { design: designPlugin },
@@ -172,6 +177,8 @@ export default [
 ```
 
 Use a dynamic `import()` for the plugin. The `designLint()` call prepares the token data the rules need, and the plugin reads it when it loads.
+
+The rules use whatever parser your config already sets for these files, so it must read JSX, and TypeScript if you use it.
 
 ## Contributing
 
