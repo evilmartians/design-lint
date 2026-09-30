@@ -153,6 +153,7 @@ The rules can also run in ESLint v9 flat config. Resolve the design system first
 
 ```js
 // eslint.config.mjs
+import tseslint from "typescript-eslint";
 import { designLint } from "@evilmartians/design-lint/preset";
 
 const design = await designLint({
@@ -165,6 +166,10 @@ const designPlugin = (await import("@evilmartians/design-lint/oxlint")).default;
 export default [
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
+    languageOptions: {
+      parser: tseslint.parser,
+      parserOptions: { ecmaFeatures: { jsx: true } },
+    },
     plugins: { design: designPlugin },
     rules: design.rules,
   },
@@ -172,6 +177,8 @@ export default [
 ```
 
 Use a dynamic `import()` for the plugin. The `designLint()` call prepares the token data the rules need, and the plugin reads it when it loads.
+
+ESLint's default parser reads neither TypeScript nor JSX, so the example uses the parser from [`typescript-eslint`](https://typescript-eslint.io). If your config already sets a parser for these files, keep yours. For a JavaScript-only project, drop `parser` and keep `ecmaFeatures: { jsx: true }`.
 
 ## Contributing
 
