@@ -1,0 +1,31 @@
+README.md
+  s_4befc0e33bb371::t_efc393a2c8f028 156,169-172,181
+  s_4befc0e33bb371::t_191f43aba1ad58 182
+package.json
+  s_4befc0e33bb371::t_6ac8620d5f646c 15
+  s_4befc0e33bb371::t_efc393a2c8f028 3
+test/eslint.test.js
+  s_4befc0e33bb371::t_1bc94ce89ab15a 1-51
+src/plugin.js
+  s_4befc0e33bb371::t_e68b0595f8ae72 39-44,46-47
+CHANGELOG.md
+  s_4befc0e33bb371::t_efc393a2c8f028 3-10
+package-lock.json
+  s_4befc0e33bb371::t_b130b2f305e8d4 3,9,16,476-685,1533-1539,1655-1717,1728-1745,1756-1765,1783-1799,1810-1851,1880-1886,1960-1963,1967-1970,1973-1977,1980-2018,2020-2023,2026,2029,2034-2037,2039-2043,2045-2048,2051-2054,2056-2062,2064-2067,2069-2370,2380-2447,2721-2743,2761-2773,2800-2824,2874-2938,3005-3034,3081-3103,3135-3147,3161-3173,3256-3278,3450-3465,3482-3504
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c7de1283c67b52b89f175990ad4a249c5fde8f8c",
+  "prompts": {},
+  "sessions": {
+    "s_4befc0e33bb371": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a08bd4eb-2db7-4a12-88d6-40d3237a0e2c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
