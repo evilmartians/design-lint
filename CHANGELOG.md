@@ -5,8 +5,6 @@
 - The rules load under ESLint 9. ESLint freezes the context it hands a rule, and every rule
   that reads the resolved design system threw on load with `'get' on proxy: property
   'options' is a read-only and non-configurable data property`. Oxlint was not affected.
-- The README's ESLint example sets a parser: ESLint's default one reads neither TypeScript
-  nor JSX, so the example as written failed to parse every component file.
 
 ## 0.1.3
 
