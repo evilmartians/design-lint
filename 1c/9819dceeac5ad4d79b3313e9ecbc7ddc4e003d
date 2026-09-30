@@ -1,0 +1,21 @@
+CHANGELOG.md
+  s_4befc0e33bb371::t_b3ce1bf29d1721 8-10
+README.md
+  s_4befc0e33bb371::t_b3ce1bf29d1721 152,158,164,168-170,181
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1c9819dceeac5ad4d79b3313e9ecbc7ddc4e003d",
+  "prompts": {},
+  "sessions": {
+    "s_4befc0e33bb371": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a08bd4eb-2db7-4a12-88d6-40d3237a0e2c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
