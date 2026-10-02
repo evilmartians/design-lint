@@ -1,0 +1,23 @@
+skills/opacity-tokens/assets/report.html
+  s_8dfc40696cf216::t_d3845e57237a8f 249-252,318,326,347-351,353,401-405
+skills/opacity-tokens/scripts/screens.mjs
+  s_8dfc40696cf216::t_a4573415017993 5-17,31-34,48,52,56-76,78-83,85-94,158,160-174,176-238,240-242,246
+skills/opacity-tokens/SKILL.md
+  s_8dfc40696cf216::t_a1127d48b540a2 80,84-94,97,100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "6e5853673d1d77e6ed9f0f5ef2c5d2d30ef5187d",
+  "prompts": {},
+  "sessions": {
+    "s_8dfc40696cf216": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1dde35eb-6cc4-44cb-8a32-409c4d857cce",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
