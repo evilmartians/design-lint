@@ -1,0 +1,390 @@
+<title>__TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Fragment+Mono&display=swap">
+<style>
+/* Layout: one reading column (report), widening to a full-bleed grid for screenshot comparisons. */
+:root {
+  --paper: oklch(0.985 0.002 100);
+  --sheet: oklch(1 0 0);
+  --ink: oklch(0.24 0.006 100);
+  --ink-2: oklch(0.47 0.008 100);
+  --rule: oklch(0.9 0.004 100);
+  --teal: oklch(0.52 0.1 205);
+  --teal-wash: oklch(0.95 0.025 205);
+  --good: oklch(0.52 0.12 145);
+  --warn: oklch(0.6 0.14 70);
+  --bad: oklch(0.55 0.18 29);
+  --checker-a: oklch(0.93 0.003 100);
+  --checker-b: oklch(1 0 0);
+  --s1: oklch(0.82 0.07 205); --s2: oklch(0.68 0.1 205); --s3: oklch(0.52 0.1 205); --s4: oklch(0.38 0.08 205);
+  --sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Fragment Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --step--1: 0.8125rem; --step-0: 0.9375rem; --step-1: 1.125rem; --step-2: 1.5rem; --step-3: 2.25rem;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: oklch(0.17 0.004 100); --sheet: oklch(0.21 0.004 100); --ink: oklch(0.93 0.004 100); --ink-2: oklch(0.72 0.006 100);
+  --rule: oklch(0.31 0.005 100); --teal: oklch(0.74 0.1 205); --teal-wash: oklch(0.28 0.04 205);
+  --good: oklch(0.75 0.13 145); --warn: oklch(0.8 0.13 75); --bad: oklch(0.72 0.15 29);
+  --s1: oklch(0.4 0.06 205); --s2: oklch(0.55 0.09 205); --s3: oklch(0.7 0.1 205); --s4: oklch(0.85 0.07 205); --checker-a: oklch(0.3 0.004 100); --checker-b: oklch(0.24 0.004 100); color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: oklch(0.17 0.004 100); --sheet: oklch(0.21 0.004 100); --ink: oklch(0.93 0.004 100); --ink-2: oklch(0.72 0.006 100);
+  --rule: oklch(0.31 0.005 100); --teal: oklch(0.74 0.1 205); --teal-wash: oklch(0.28 0.04 205);
+  --good: oklch(0.75 0.13 145); --warn: oklch(0.8 0.13 75); --bad: oklch(0.72 0.15 29);
+  --s1: oklch(0.4 0.06 205); --s2: oklch(0.55 0.09 205); --s3: oklch(0.7 0.1 205); --s4: oklch(0.85 0.07 205); --checker-a: oklch(0.3 0.004 100); --checker-b: oklch(0.24 0.004 100); color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font: 400 var(--step-0)/1.55 var(--sans); padding-inline: 16px; padding-block: 40px 80px; }
+.wrap { max-width: 1080px; margin-inline: auto; display: grid; gap: 56px; }
+.col { max-width: 68ch; }
+h1, h2, h3 { text-wrap: balance; margin: 0; line-height: 1.2; }
+h1 { font-size: var(--step-3); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: var(--step-2); font-weight: 600; }
+h3 { font-size: var(--step-1); font-weight: 600; }
+p { margin: 0; }
+section { display: grid; gap: 18px; min-width: 0; }
+.eyebrow { font: 500 var(--step--1)/1 var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--teal); }
+.muted { color: var(--ink-2); }
+code, .mono { font-family: var(--mono); font-size: 0.86em; }
+code { background: var(--teal-wash); padding: 0.05em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+header { display: grid; gap: 14px; }
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+.stat { background: var(--sheet); padding: 16px 18px; display: grid; gap: 4px; align-content: start; }
+@media (max-width: 640px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+.stat b { font: 600 var(--step-3)/1 var(--sans); font-variant-numeric: tabular-nums; }
+.stat span { font-size: var(--step--1); color: var(--ink-2); }
+
+.bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--rule); }
+.bar i { display: block; height: 100%; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: var(--step--1); color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+.scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--sheet); }
+table { border-collapse: collapse; width: 100%; font-size: var(--step--1); font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; white-space: nowrap; }
+th { font-weight: 600; color: var(--ink-2); background: var(--paper); position: sticky; top: 0; }
+tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; }
+td.wrap { white-space: normal; min-width: 220px; }
+
+.swatch { width: 44px; height: 22px; border-radius: 5px; border: 1px solid var(--rule);
+  background-image: linear-gradient(var(--sw), var(--sw)), conic-gradient(var(--checker-a) 25%, var(--checker-b) 0 50%, var(--checker-a) 0 75%, var(--checker-b) 0);
+  background-size: 100% 100%, 10px 10px; }
+.chip { display: inline-block; padding: 1px 7px; border-radius: 999px; font: 500 11px/1.6 var(--mono); background: var(--teal-wash); color: var(--ink); margin: 0 3px 3px 0; }
+.chip.snap { background: color-mix(in oklab, var(--warn) 22%, transparent); }
+
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 24px; align-items: start; }
+.grid2 > * { min-width: 0; align-content: start; }
+ol.plain, ul.plain { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+
+.diffs { display: grid; gap: 28px; }
+.diff { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.diff-head { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; justify-content: space-between; }
+.diff-head > * { min-width: 0; overflow-wrap: anywhere; }
+.diff-head h3 { font-size: var(--step-0); }
+.trio { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 10px; }
+figure { margin: 0; display: grid; gap: 6px; min-width: 0; }
+figcaption { font: 500 11px/1 var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-2); }
+figure img { width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 6px; background: oklch(1 0 0); }
+.changes { font: 12px/1.6 var(--mono); color: var(--ink-2); overflow-wrap: anywhere; }
+.changes .from { color: var(--bad); } .changes .to { color: var(--good); }
+
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); gap: 14px; margin-top: 14px; }
+.thumbs figure img { aspect-ratio: 3 / 2; object-fit: cover; object-position: top left; }
+.thumbs figcaption { text-transform: none; letter-spacing: 0; font-size: 11px; line-height: 1.35; }
+details { border: 1px solid var(--rule); border-radius: 10px; background: var(--sheet); padding: 12px 16px; }
+summary { cursor: pointer; font-weight: 600; }
+summary:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; border-radius: 4px; }
+.note { border-left: 3px solid var(--warn); padding: 4px 0 4px 14px; }
+pre { margin: 0; font: 12px/1.6 var(--mono); background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 16px; overflow-x: auto; }
+
+.roles { display: grid; gap: 22px; }
+.role { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; display: grid; gap: 14px; min-width: 0; }
+.role .scroll { border-radius: 8px; }
+.role-head { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: baseline; }
+.role-head > * { min-width: 0; overflow-wrap: anywhere; }
+.role-head .mono { font-size: 12px; }
+.hist-wrap { overflow-x: auto; }
+.hist { display: flex; align-items: flex-end; gap: 4px; height: 140px; min-width: 520px; padding-top: 16px; }
+.hb { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 3px; min-width: 0; }
+.hb i { display: block; width: 100%; border-radius: 3px 3px 0 0; }
+.hn { font: 10px/1 var(--mono); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.ha { font: 10px/1 var(--mono); color: var(--ink-2); padding-top: 4px; border-top: 1px solid var(--rule); width: 100%; text-align: center; }
+.key { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px; vertical-align: -1px; }
+
+/* Screenshot viewer: one large stage per story; slider, flip tabs, and a full-size lightbox. */
+.viewer { display: grid; gap: 10px; min-width: 0; }
+.vbar { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; }
+.tabs { display: inline-flex; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--paper); }
+.tabs button, .enlarge, .close { font: 500 13px/1 var(--sans); color: var(--ink); background: transparent; border: 0; padding: 8px 12px; cursor: pointer; }
+.tabs button + button { border-left: 1px solid var(--rule); }
+.tabs button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.enlarge, .close { border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); }
+.tabs button:focus-visible, .enlarge:focus-visible, .close:focus-visible, .pos:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.stage { position: relative; width: 100%; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: oklch(1 0 0); line-height: 0; }
+.stage .im { display: block; width: 100%; height: auto; max-width: none; }
+.stage .im-after, .stage .im-diff { position: absolute; inset: 0 auto auto 0; }
+.viewer[data-mode="slide"] .stage { cursor: ew-resize; }
+.viewer[data-mode="slide"] .im-after { clip-path: inset(0 0 0 var(--pos)); }
+.viewer[data-mode="slide"] .im-diff,
+.viewer[data-mode="before"] .im-after, .viewer[data-mode="before"] .im-diff,
+.viewer[data-mode="after"] .im-diff { display: none; }
+.viewer:not(.big):not([data-mode="slide"]) .stage { cursor: zoom-in; }
+.handle { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 2px; margin-left: -1px; background: var(--teal); pointer-events: none; box-shadow: 0 0 0 1px oklch(1 0 0 / 0.7); }
+.viewer:not([data-mode="slide"]) .handle, .viewer:not([data-mode="slide"]) .tag, .viewer:not([data-mode="slide"]) .pos { display: none; }
+.tag { position: absolute; top: 8px; font: 500 11px/1 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 6px; border-radius: 4px; background: oklch(0.24 0.006 100 / 0.8); color: oklch(0.98 0 0); pointer-events: none; }
+.tag-l { left: 8px; } .tag-r { right: 8px; }
+.pos { width: 100%; accent-color: var(--teal); }
+.hint { font-size: 12px; margin-left: auto; }
+dialog#lightbox { width: min(96vw, 2400px); max-height: 94vh; padding: 16px; border: 1px solid var(--rule); border-radius: 12px; background: var(--sheet); color: var(--ink); overflow: auto; }
+dialog#lightbox::backdrop { background: oklch(0.15 0.005 100 / 0.7); }
+.lb-inner { display: grid; gap: 12px; }
+.lb-inner h3 { font-size: var(--step-0); }
+.viewer.big .vbar { position: sticky; top: -16px; z-index: 1; background: var(--sheet); padding-block: 8px; }
+@media (prefers-reduced-motion: no-preference) { .tabs button { transition: background-color .12s; } }
+</style>
+
+<div class="wrap">
+  <header class="col">
+    <span class="eyebrow" id="eyebrow"></span>
+    <h1>Opacity tokens by role</h1>
+    <p class="muted" id="intro"></p>
+  </header>
+
+  <section>
+    <div class="stats" id="stats"></div>
+    <div class="bar" id="bar" role="img" aria-label="Share of original errors fixed and remaining by reason"></div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">1 · Steps</span>
+    <h2 id="steps-h">Steps per role</h2>
+    <div class="col" style="display:grid;gap:12px">
+      <p id="steps-intro"></p>
+      <p><b>How values move.</b> Each value moves to the nearest step in its role. Distance is measured in log-odds, so going from 5% to 10% counts the same as going from 90% to 95%. Values more than <span id="cap"></span> log-odds from every step stay as lint errors. Text only moves toward more opaque, so contrast never drops. If two different opacities of one color on one line (a resting state and its hover, for example) would land on the same step, both are left alone.</p>
+    </div>
+    <div class="roles" id="roles"></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">2 · Tokens</span>
+    <h2 id="pairs-h">Token pairs</h2>
+    <p class="col" id="tokens-intro"></p>
+    <pre id="css"></pre>
+    <div class="scroll"><table id="pairs"></table></div>
+  </section>
+
+  <section>
+    <span class="eyebrow">3 · Errors</span>
+    <h2>Fixed and remaining</h2>
+    <div class="grid2">
+      <div style="display:grid;gap:10px"><h3 id="why-h">Why errors remain</h3><div class="scroll"><table id="reasons"></table></div></div>
+      <div style="display:grid;gap:10px"><h3>Next 10 pairs by volume</h3><p class="muted" style="font-size:var(--step--1)">These already map to a step and fall just below the cut.</p><div class="scroll"><table id="next"></table></div></div>
+      <div style="display:grid;gap:10px"><h3>Remaining by color</h3><div class="scroll"><table id="remc"></table></div></div>
+      <div style="display:grid;gap:10px"><h3>Remaining by directory</h3><div class="scroll"><table id="remd"></table></div></div>
+    </div>
+    <details>
+      <summary id="coll-sum"></summary>
+      <p class="muted" style="margin-top:10px;font-size:var(--step--1)">These are pairs of states that would become identical: a resting value and its hover, or a resting value and its pressed state. Each one needs a decision, for example a solid hover token or a different step for one of the two.</p>
+      <div class="scroll" style="margin-top:12px"><table id="coll"></table></div>
+    </details>
+  </section>
+
+  <section id="shots-section">
+    <span class="eyebrow">4 · Screenshots</span>
+    <h2 id="shots-h">Stories that changed</h2>
+    <div class="col" style="display:grid;gap:10px">
+      <p id="shots-intro"></p>
+      <p class="note" id="state-note"></p>
+    </div>
+    <div class="diffs" id="diffs"></div>
+    <details>
+      <summary id="snapped-sum"></summary>
+      <div class="scroll" style="margin-top:12px;max-height:520px"><table id="snapped"></table></div>
+    </details>
+    <details>
+      <summary id="same-sum"></summary>
+      <div class="thumbs" id="thumbs"></div>
+    </details>
+  </section>
+
+  <section class="col">
+    <span class="eyebrow">5 · Notes</span>
+    <h2>Findings</h2>
+    <ul class="plain" id="notes"></ul>
+  </section>
+</div>
+
+<dialog id="lightbox" aria-label="Screenshot comparison"><div class="lb-inner"></div></dialog>
+
+<script id="data" type="application/json">__DATA__</script>
+<script id="imgs" type="application/json">__IMGS__</script>
+<script>
+(() => {
+  const D = JSON.parse(document.getElementById("data").textContent);
+  const IMG = JSON.parse(document.getElementById("imgs").textContent);
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const fmt = (n) => n.toLocaleString("en-US");
+  const M = D.meta;
+  const code = (s) => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
+  $("eyebrow").textContent = `${M.repo} · ${M.rule}`;
+  $("intro").innerHTML = `This change turns on <code>${esc(M.rule)}</code> in a separate worktree. It fits one small set of opacity steps per role (surfaces, lines, text) to the ${fmt(D.before)} existing <code>/N</code> modifiers, defines the ${D.pairs.length} most-used color and step pairs as theme tokens, and swaps them into the code.` + (D.shots.length ? " Every Storybook story that touches a changed file was then rendered before and after, and the two renders were compared pixel by pixel." : "");
+  const ex = D.pairs.find((p) => p.role === "surface") || D.pairs[0];
+  $("tokens-intro").innerHTML = `Each pair is one theme color at one step. It is defined once in the <code>@theme inline</code> block of <code>${esc(M.tokenFile)}</code>.` + (ex ? ` A class like <code>${esc(ex.example.from)}</code> becomes <code>${esc(ex.example.to)}</code>.` : "") + " Orange chips mark source values that moved to the step.";
+  $("notes").innerHTML = D.notes.map((n) => `<li><b>${code(n.title)}</b> ${code(n.body)}</li>`).join("");
+  const roleWord = ["", "One set", "Two sets", "Three sets"][D.roles.length] || `${D.roles.length} sets`;
+  $("steps-h").textContent = `${roleWord} of steps, one per role`;
+  const examples = D.roles.map((r) => D.pairs.find((p) => p.role === r.role)).filter(Boolean).map((p) => `<code>${esc(p.example.to.split(":").pop())}</code>`);
+  const median = (r) => { const all = r.dist.flatMap(([a, n]) => Array(n).fill(parseFloat(a.replace(/^\[|\]$/g, "")) * (a.startsWith("[") ? 100 : 1))).sort((x, y) => x - y); return Math.round(all[all.length >> 1]); };
+  $("steps-intro").innerHTML = `Surfaces, lines and text use opacity for different jobs, and their values cluster in different places: the typical value is ${D.roles.map((r) => `${median(r)}% for ${r.role === "surface" ? "surfaces" : r.role === "line" ? "lines" : "text"}`).join(", ")}. So each role gets its own steps, chosen where its values actually cluster, and its own names. A class then says what it is for` + (examples.length ? `: ${examples.join(", ")}.` : ".");
+  $("cap").textContent = D.cap === 1 ? "one unit" : `${D.cap} units`;
+  $("pairs-h").textContent = `${D.pairs.length} token pairs`;
+  const R = D.reasons;
+  const fixed = R.fixed, exact = D.pairs.reduce((a, p) => a + p.exact, 0);
+  const shots = D.shots, changed = shots.filter((s) => s.diff !== 0 && !s.broken && !s.flaky && s.crop), same = shots.filter((s) => s.diff === 0 && !s.broken);
+  const stepCount = D.roles.reduce((a, r) => a + r.steps.length, 0);
+  const ROLE = {
+    surface: { label: "Surfaces", uses: "bg, from / via / to, svg fill" },
+    line: { label: "Lines", uses: "border, ring, divide, outline, decoration, stroke" },
+    text: { label: "Text", uses: "text, placeholder, caret" },
+  };
+
+  $("stats").innerHTML = [
+    [fmt(D.before), "opacity-modifier errors on main"],
+    [fmt(fixed), `fixed · ${fmt(exact)} same opacity, ${fmt(fixed - exact)} moved to a step`],
+    [fmt(D.after), "remaining after the swap"],
+    [String(D.pairs.length), `tokens · ${stepCount} steps across ${D.roles.length} roles`],
+    [fmt(D.files), "files touched"],
+    ...(shots.length ? [[`${changed.length}/${changed.length + same.length}`, "stories that look different at rest"]] : []),
+  ].map(([b, s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
+
+  const segs = [
+    ["fixed", "Fixed", "var(--good)"],
+    ["not-top", `Maps to a step, pair not in the top ${D.pairs.length}`, "var(--teal)"],
+    ["collision", "Held back: would merge two states", "var(--ink-2)"],
+    ["off-ladder", "Too far from any step", "var(--warn)"],
+    ["non-semantic", "Palette / non-theme color", "var(--bad)"],
+  ];
+  $("bar").innerHTML = segs.map(([k, , c]) => `<i style="width:${(100 * (R[k] || 0)) / D.before}%;background:${c}"></i>`).join("");
+  $("legend").innerHTML = segs.map(([k, l, c]) => `<span><i style="background:${c}"></i>${l} · ${fmt(R[k] || 0)}</span>`).join("");
+
+  // Per role: a histogram of the opacities in use, each bar tinted by the step that absorbs it.
+  const stepTone = ["var(--s1)", "var(--s2)", "var(--s3)", "var(--s4)"];
+  $("roles").innerHTML = D.roles.map((r) => {
+    const toneOf = {};
+    r.steps.forEach((s, i) => s.absorbs.forEach((a) => (toneOf[a] = stepTone[i])));
+    const max = Math.max(...r.dist.map(([, n]) => n));
+    const bars = r.dist.map(([a, n]) => `<div class="hb" title="/${esc(a)}: ${n}"><span class="hn">${n}</span><i style="height:${Math.max(2, (100 * n) / max)}%;background:${toneOf[a] || "var(--rule)"}"></i><span class="ha">${esc(a.startsWith("[") ? +(parseFloat(a.slice(1)) * 100).toFixed(1) : a)}</span></div>`).join("");
+    const rows = r.steps.map((s, i) => `<tr><td><span class="key" style="background:${stepTone[i]}"></span><span class="mono">${s.name}</span></td><td class="num">${s.step}%</td><td><div class="swatch" style="--sw:color-mix(in oklab, var(--teal) ${s.step}%, transparent)"></div></td><td class="num">${s.total}</td><td class="num">${s.exact}</td><td>${s.absorbs.map((a) => `<span class="chip ${Number(a) === s.step ? "" : "snap"}">/${esc(a)}</span>`).join("")}</td></tr>`).join("");
+    return `<article class="role"><div class="role-head"><h3>${ROLE[r.role].label}</h3><span class="muted mono">${ROLE[r.role].uses} · ${fmt(r.total)} uses, ${Math.round((100 * r.onLadder) / r.total)}% within reach of a step</span></div>
+      <div class="hist-wrap"><div class="hist" role="img" aria-label="${ROLE[r.role].label}: opacity values in use, colored by step">${bars}</div></div>
+      <div class="scroll"><table><tr><th>Step</th><th class="num">Opacity</th><th>Sample</th><th class="num">Uses</th><th class="num">Unchanged</th><th>Absorbs</th></tr>${rows}</table></div></article>`;
+  }).join("");
+
+  const sorted = [...D.pairs].sort((a, b) => a.role.localeCompare(b.role) || a.step - b.step || a.color.localeCompare(b.color));
+  const ladderLines = D.roles.map((r) => `${r.role.padEnd(8)} ${r.steps.map((s) => `${s.name} ${s.step}`).join(" · ")}`);
+  $("css").textContent = "@theme inline {\n  /* " + ladderLines.join("\n     ") + " */\n" + sorted.filter((_, i) => i % 5 === 0).map((p) => `  --color-${p.token}: color-mix(in oklab, ${p.value} ${p.step}%, transparent);`).join("\n") + `\n  /* …${sorted.length - Math.ceil(sorted.length / 5)} more */\n}`;
+  $("pairs").innerHTML = `<tr><th>#</th><th>Token</th><th>Role</th><th class="num">Uses</th><th class="num">Moved</th><th>Replaced</th><th>Used as</th><th class="num">In a state</th><th class="num">Files</th></tr>` +
+    D.pairs.map((p, i) => `<tr><td class="num muted">${i + 1}</td><td class="mono">${esc(p.token)}</td><td>${ROLE[p.role].label}</td><td class="num">${p.hits}</td><td class="num">${p.hits - p.exact || ""}</td><td>${Object.entries(p.src).map(([a, n]) => `<span class="chip ${Number(a) === p.step ? "" : "snap"}">/${esc(a)} ×${n}</span>`).join("")}</td><td>${Object.entries(p.utils).map(([u, n]) => `${esc(u)} ${n}`).join(", ")}</td><td class="num">${p.state}</td><td class="num">${p.files}</td></tr>`).join("");
+
+  const reasonText = {
+    "not-top": `Maps to a step, but the pair is outside the top ${D.pairs.length}`,
+    collision: "Two states of one element would become identical",
+    "off-ladder": "Too far from every step (or text would lose contrast)",
+    "non-semantic": "Palette or non-theme color (black, white, fuchsia…)",
+  };
+  $("why-h").textContent = `Why ${fmt(D.after)} remain`;
+  $("reasons").innerHTML = `<tr><th>Reason</th><th class="num">Uses</th></tr>` + segs.slice(1).map(([k]) => `<tr><td class="wrap">${reasonText[k]}</td><td class="num">${R[k] || 0}</td></tr>`).join("");
+  $("next").innerHTML = `<tr><th>Token</th><th class="num">Uses</th></tr>` + D.nextPairs.map(([t, n]) => `<tr><td class="mono">${esc(t)}</td><td class="num">${n}</td></tr>`).join("");
+  $("remc").innerHTML = `<tr><th>Color</th><th class="num">Uses</th></tr>` + D.remByColor.map(([c, n]) => `<tr><td class="mono">${esc(c)}</td><td class="num">${n}</td></tr>`).join("");
+  $("remd").innerHTML = `<tr><th>Directory</th><th class="num">Uses</th></tr>` + D.remDirs.map(([c, n]) => `<tr><td class="mono">${esc(c)}</td><td class="num">${n}</td></tr>`).join("");
+  $("coll-sum").textContent = `${D.collisions.length} uses held back because two states would merge`;
+  $("coll").innerHTML = `<tr><th>File</th><th>Class</th></tr>` + D.collisions.map((c) => `<tr><td class="mono">${esc(c.file.replace(/^src\//, ""))}</td><td class="mono">${esc(c.cls)}</td></tr>`).join("");
+
+  if (!shots.length) $("shots-section").hidden = true;
+  const total = changed.length + same.length;
+  $("shots-h").textContent = `${changed.length} of ${total} stories changed at rest`;
+  $("shots-intro").textContent = `${fmt(total)} working stories cover the changed files. Each was rendered at 1200px wide from a Storybook build of main and one of this branch, with animations off, and the two were compared pixel by pixel. Crops are framed around the changed pixels, which the diff image marks in red. Stories are sorted by how many pixels changed.`;
+  $("state-note").innerHTML = `Screenshots show the resting state only. ${D.stateSnapped} of the ${D.snapped.length} moved values sit behind a state variant (<code>hover:</code>, <code>focus-visible:</code>, <code>active:</code>, <code>data-[state]</code>), so those changes need a check by hand. They are all in the table under the screenshots.`;
+
+  const byFile = {};
+  for (const s of D.snapped) (byFile[s.file] ||= []).push(s);
+  const LABEL = { before: "Main", after: "Branch", diff: "Diff" };
+  const src = (s, k) => IMG[`${s.story}.${k}.webp`] || "";
+  const ordered = changed.sort((a, b) => b.diff - a.diff);
+  const viewer = (s, i, big) => `<div class="viewer${big ? " big" : ""}" data-mode="slide" data-i="${i}">
+      <div class="vbar">
+        <div class="tabs" role="group" aria-label="View">${[["slide", "Slider"], ["before", "Main"], ["after", "Branch"], ["diff", "Diff"]].map(([m, l]) => `<button type="button" data-mode="${m}" aria-pressed="${m === "slide"}">${l}</button>`).join("")}</div>
+        ${big ? `<span class="muted hint">Keys 1–4 switch views · Esc closes</span><button type="button" class="close" aria-label="Close">Close</button>` : `<button type="button" class="enlarge" aria-label="Open ${esc(s.title)} full size">Enlarge ↗</button>`}
+      </div>
+      <div class="stage" style="--pos:50%;max-width:${Math.round(s.crop.width * (big ? 2 : 1.5))}px">
+        <img class="im im-before" src="${src(s, "before")}" alt="${esc(s.title)} on main">
+        <img class="im im-after" src="${src(s, "after")}" alt="${esc(s.title)} on this branch">
+        <img class="im im-diff" src="${src(s, "diff")}" alt="Pixel diff; changed pixels in red">
+        <span class="tag tag-l">Main</span><span class="tag tag-r">Branch</span>
+        <div class="handle" aria-hidden="true"></div>
+      </div>
+      <input type="range" class="pos" min="0" max="100" value="50" aria-label="Slider position: main on the left, branch on the right">
+    </div>`;
+  $("diffs").innerHTML = ordered.map((s, i) => {
+    const snaps = s.files.flatMap((f) => byFile[f] || []);
+    const shown = snaps.slice(0, 8);
+    const why = snaps.length
+      ? shown.map((x) => `<span class="from">${esc(x.cls)}</span> → <span class="to">${esc(x.new)}</span>`).join("<br>") + (snaps.length > shown.length ? `<br>…and ${snaps.length - shown.length} more` : "")
+      : "No value moved in this file. The change comes from a child component it renders.";
+    return `<article class="diff"><div class="diff-head"><h3>${esc(s.title)}</h3><span class="mono muted">${fmt(s.diff)} px · ${s.files.map(esc).join(", ")}</span></div>
+      ${viewer(s, i, false)}
+      <div class="changes">${why}</div></article>`;
+  }).join("");
+
+  const setMode = (v, mode) => {
+    v.dataset.mode = mode;
+    v.querySelectorAll(".tabs button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+  };
+  const setPos = (v, pct) => {
+    const p = Math.max(0, Math.min(100, pct));
+    v.querySelector(".stage").style.setProperty("--pos", p + "%");
+    v.querySelector(".pos").value = String(Math.round(p));
+  };
+  const box = $("lightbox");
+  const openBig = (i, mode) => {
+    box.querySelector(".lb-inner").innerHTML = `<h3>${esc(ordered[i].title)}</h3>` + viewer(ordered[i], i, true);
+    const v = box.querySelector(".viewer");
+    setMode(v, mode);
+    box.showModal();
+  };
+  document.addEventListener("click", (e) => {
+    const v = e.target.closest(".viewer");
+    if (!v) return;
+    const tab = e.target.closest(".tabs button");
+    if (tab) return setMode(v, tab.dataset.mode);
+    if (e.target.closest(".enlarge")) return openBig(+v.dataset.i, v.dataset.mode);
+    if (e.target.closest(".close")) return box.close();
+    if (e.target.closest(".stage") && !v.classList.contains("big") && v.dataset.mode !== "slide") openBig(+v.dataset.i, v.dataset.mode);
+  });
+  document.addEventListener("pointermove", (e) => {
+    const st = e.target.closest?.(".viewer[data-mode=slide] .stage");
+    if (!st) return;
+    const r = st.getBoundingClientRect();
+    setPos(st.closest(".viewer"), ((e.clientX - r.left) / r.width) * 100);
+  });
+  document.addEventListener("input", (e) => {
+    if (e.target.classList.contains("pos")) setPos(e.target.closest(".viewer"), +e.target.value);
+  });
+  box.addEventListener("click", (e) => { if (e.target === box) box.close(); });
+  box.addEventListener("keydown", (e) => {
+    const m = { 1: "slide", 2: "before", 3: "after", 4: "diff" }[e.key];
+    const v = box.querySelector(".viewer");
+    if (m && v) setMode(v, m);
+  });
+
+  $("snapped-sum").textContent = `All ${D.snapped.length} values that moved to a step`;
+  $("snapped").innerHTML = `<tr><th>File</th><th>Was</th><th>Now</th></tr>` + D.snapped.map((x) => `<tr><td class="mono">${esc(x.file.replace(/^src\//, ""))}</td><td class="mono">${esc(x.cls)}</td><td class="mono">${esc(x.new)}</td></tr>`).join("");
+
+  $("same-sum").textContent = `${same.length} stories with no visible change`;
+  $("thumbs").innerHTML = same.sort((a, b) => a.title.localeCompare(b.title)).map((s) => `<figure><img loading="lazy" src="${IMG[`${s.story}.thumb.webp`]}" alt="${esc(s.title)}"><figcaption>${esc(s.title)}</figcaption></figure>`).join("");
+})();
+</script>
