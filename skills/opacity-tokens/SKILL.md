@@ -77,16 +77,27 @@ Then lint the worktree again and record the remaining `no-opacity-modifier` coun
 
 ### 6. Screenshots (when the repo has Storybook)
 
-Build both sides as static Storybooks, install the screenshot tools once, then diff:
+Build the "before" Storybook, then count the stories each coverage option would render:
 
 ```sh
 (cd <original checkout> && npx storybook build -o $W/sb-before --quiet)
-(cd <worktree> && npx storybook build -o $W/sb-after --quiet)
-npm i --prefix $W/tools playwright pngjs pixelmatch sharp
-node $SKILL/scripts/screens.mjs --work $W --before $W/sb-before --after $W/sb-after --repo <worktree> --tools $W/tools
+node $SKILL/scripts/screens.mjs --count --work $W --before $W/sb-before --repo <worktree>
 ```
 
-screens.mjs finds every story that covers a changed file and renders it on both sides, 1200px wide with animations off. Each capture waits until two consecutive screenshots are identical, because a fixed wait under load catches pages before late content lands. A story that differs is rendered again on the "before" side to prove the difference is real, then re-shot at 2× and cropped around the changed pixels. A story that never settles, or renders differently on its own, is marked flaky and its diff left out. A story that renders before but shows Storybook's error screen after is a **regression**. A story already failing before is set aside as broken. A story that will not load at all, even on a retry, is counted as failed to load and makes no claim either way; rerun the script to cover it. It uses the local Chrome, or `npx playwright install chromium` if Chrome is missing.
+Ask the user which coverage they want, with both counts:
+
+- **First story** (`--stories first`): the first story of each story file that covers a changed file, usually "Default". It is the faster option, but it misses changes that only show in other variants, such as destructive, disabled or a size.
+- **All stories** (`--stories all`): every story in a component's own story file, plus the first story of each file that only imports it. The run takes about as many times longer as the counts differ. The report stays about the same size, because each story file still gets one before/after viewer, for its largest change, and the file's other changed stories are listed under it by name.
+
+Done when the user has picked one. Then build "after", install the screenshot tools once, and diff:
+
+```sh
+(cd <worktree> && npx storybook build -o $W/sb-after --quiet)
+npm i --prefix $W/tools playwright pngjs pixelmatch sharp
+node $SKILL/scripts/screens.mjs --work $W --before $W/sb-before --after $W/sb-after --repo <worktree> --tools $W/tools --stories first|all
+```
+
+screens.mjs renders the chosen stories on both sides, 1200px wide with animations off. Each capture waits until two consecutive screenshots are identical, because a fixed wait under load catches pages before late content lands. A story that differs is rendered again on the "before" side to prove the difference is real, The largest change in each story file, and every regression, is then re-shot at 2× and cropped around the changed pixels. A story that never settles, or renders differently on its own, is marked flaky and its diff left out. A story that renders before but shows Storybook's error screen after is a **regression**. A story already failing before is set aside as broken. A story that will not load at all, even on a retry, is counted as failed to load and makes no claim either way; rerun the script to cover it. It uses the local Chrome, or `npx playwright install chromium` if Chrome is missing.
 
 Done when it prints its counts and the regression count is zero. For each regression, open the story in the "after" build, find which rewritten class broke it, and fix it or put that class back to its `/N` form. Then rebuild "after" and rerun. If the user wants to keep a regression for now, the report shows it first, flagged. Skip this step for a repo without Storybook; the report then leaves out the screenshot section.
 

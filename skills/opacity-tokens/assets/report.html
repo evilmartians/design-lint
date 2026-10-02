@@ -246,7 +246,10 @@ dialog#lightbox::backdrop { background: oklch(0.15 0.005 100 / 0.7); }
   $("pairs-h").textContent = `${D.pairs.length} token pairs`;
   const R = D.reasons;
   const fixed = R.fixed, exact = D.pairs.reduce((a, p) => a + p.exact, 0);
-  const shots = D.shots, changed = shots.filter((s) => (s.diff !== 0 || s.regression) && !s.broken && !s.flaky && s.crop),
+  // changed: every story that looks different. featured: the ones with images, one per story
+  // file plus every regression; the rest of a file's changed stories are listed under it.
+  const shots = D.shots, changed = shots.filter((s) => (s.diff || s.regression) && !s.broken && !s.flaky && !s.failed),
+    featured = changed.filter((s) => s.crop),
     same = shots.filter((s) => s.diff === 0 && !s.broken && !s.regression && !s.failed);
   const stepCount = D.roles.reduce((a, r) => a + r.steps.length, 0);
   const ROLE = {
@@ -312,7 +315,7 @@ dialog#lightbox::backdrop { background: oklch(0.15 0.005 100 / 0.7); }
   if (!shots.length) $("shots-section").hidden = true;
   const total = changed.length + same.length;
   $("shots-h").textContent = `${changed.length} of ${total} stories changed at rest`;
-  $("shots-intro").textContent = `${fmt(total)} working stories cover the changed files. Each was rendered at 1200px wide from a Storybook build of main and one of this branch, with animations off, and the two were compared pixel by pixel. Crops are framed around the changed pixels, which the diff image marks in red. Stories are sorted by how many pixels changed.`;
+  $("shots-intro").textContent = `${fmt(total)} working stories cover the changed files. Each was rendered at 1200px wide from a Storybook build of main and one of this branch, with animations off, and the two were compared pixel by pixel. Crops are framed around the changed pixels, which the diff image marks in red. Stories are sorted by how many pixels changed.` + (featured.length < changed.length ? ` Where one story file has several changed stories, the one with the largest change is shown and the others are listed under it.` : "");
   $("state-note").innerHTML = `Screenshots show the resting state only. ${D.stateSnapped} of the ${D.snapped.length} moved values sit behind a state variant (<code>hover:</code>, <code>focus-visible:</code>, <code>active:</code>, <code>data-[state]</code>), so those changes need a check by hand. They are all in the table under the screenshots.`;
 
   const byFile = {};
@@ -320,7 +323,7 @@ dialog#lightbox::backdrop { background: oklch(0.15 0.005 100 / 0.7); }
   const LABEL = { before: "Main", after: "Branch", diff: "Diff" };
   const src = (s, k) => IMG[`${s.story}.${k}.webp`] || "";
   // Regressions first: a story the change broke matters more than any tint.
-  const ordered = changed.sort((a, b) => (b.regression ? 1 : 0) - (a.regression ? 1 : 0) || b.diff - a.diff);
+  const ordered = featured.sort((a, b) => (b.regression ? 1 : 0) - (a.regression ? 1 : 0) || b.diff - a.diff);
   const viewer = (s, i, big) => `<div class="viewer${big ? " big" : ""}" data-mode="slide" data-i="${i}">
       <div class="vbar">
         <div class="tabs" role="group" aria-label="View">${[["slide", "Slider"], ["before", "Main"], ["after", "Branch"], ["diff", "Diff"]].map(([m, l]) => `<button type="button" data-mode="${m}" aria-pressed="${m === "slide"}">${l}</button>`).join("")}</div>
@@ -341,10 +344,13 @@ dialog#lightbox::backdrop { background: oklch(0.15 0.005 100 / 0.7); }
     const why = snaps.length
       ? shown.map((x) => `<span class="from">${esc(x.cls)}</span> → <span class="to">${esc(x.new)}</span>`).join("<br>") + (snaps.length > shown.length ? `<br>…and ${snaps.length - shown.length} more` : "")
       : "No value moved in this file. The change comes from a child component it renders.";
-    const size = s.regression ? "breaks after the change" : s.diff === -1 ? "page size changed" : `${fmt(s.diff)} px`;
-    return `<article class="diff${s.regression ? " regression" : ""}"><div class="diff-head"><h3>${s.regression ? `<span class="badge">Regression</span> ` : ""}${esc(s.title)}</h3><span class="mono muted">${size} · ${s.files.map(esc).join(", ")}</span></div>
+    const size = (x) => x.regression ? "breaks after the change" : x.diff === -1 ? "page size changed" : `${fmt(x.diff)} px`;
+    const also = changed.filter((x) => x !== s && !x.crop && x.storyFile && x.storyFile === s.storyFile)
+      .sort((a, b) => (b.diff === -1 ? Infinity : b.diff) - (a.diff === -1 ? Infinity : a.diff));
+    const alsoLine = also.length ? `<p class="muted">Also changed in this story file: ${also.map((x) => `${esc(x.name ?? x.title)} (${size(x)})`).join(", ")}</p>` : "";
+    return `<article class="diff${s.regression ? " regression" : ""}"><div class="diff-head"><h3>${s.regression ? `<span class="badge">Regression</span> ` : ""}${esc(s.title)}</h3><span class="mono muted">${size(s)} · ${s.files.map(esc).join(", ")}</span></div>
       ${viewer(s, i, false)}
-      <div class="changes">${why}</div></article>`;
+      ${alsoLine}<div class="changes">${why}</div></article>`;
   }).join("");
 
   const setMode = (v, mode) => {
@@ -392,6 +398,10 @@ dialog#lightbox::backdrop { background: oklch(0.15 0.005 100 / 0.7); }
   $("snapped").innerHTML = `<tr><th>File</th><th>Was</th><th>Now</th></tr>` + D.snapped.map((x) => `<tr><td class="mono">${esc(x.file.replace(/^src\//, ""))}</td><td class="mono">${esc(x.cls)}</td><td class="mono">${esc(x.new)}</td></tr>`).join("");
 
   $("same-sum").textContent = `${same.length} stories with no visible change`;
-  $("thumbs").innerHTML = same.sort((a, b) => a.title.localeCompare(b.title)).map((s) => `<figure><img loading="lazy" src="${IMG[`${s.story}.thumb.webp`]}" alt="${esc(s.title)}"><figcaption>${esc(s.title)}</figcaption></figure>`).join("");
+  // One thumbnail per story file; the other unchanged stories are named, not pictured.
+  const sameSorted = same.sort((a, b) => a.title.localeCompare(b.title));
+  const pictured = sameSorted.filter((s) => IMG[`${s.story}.thumb.webp`]), unpictured = sameSorted.filter((s) => !IMG[`${s.story}.thumb.webp`]);
+  $("thumbs").innerHTML = pictured.map((s) => `<figure><img loading="lazy" src="${IMG[`${s.story}.thumb.webp`]}" alt="${esc(s.title)}"><figcaption>${esc(s.title)}</figcaption></figure>`).join("");
+  if (unpictured.length) $("thumbs").insertAdjacentHTML("afterend", `<p class="muted" style="margin-top:12px">Also unchanged: ${unpictured.map((s) => esc(s.title)).join(", ")}</p>`);
 })();
 </script>
