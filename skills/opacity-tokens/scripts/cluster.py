@@ -31,9 +31,13 @@ def dist(v, s, role):
     return abs(logit(v) - logit(s))
 
 
-def fit(counts, role, k, cap):
+def candidates(counts):
     # Steps are round numbers already in use: a ladder of 5% increments reads as a decision.
-    cands = sorted({v for v in counts if 0 < v < 100 and v % 5 == 0})
+    return sorted({v for v in counts if 0 < v < 100 and v % 5 == 0})
+
+
+def fit(counts, role, k, cap):
+    cands = candidates(counts)
     best = None
     for steps in itertools.combinations(cands, k):
         cost = 0.0
@@ -50,14 +54,15 @@ def fit(counts, role, k, cap):
 
 
 def names_for(role, steps):
-    words = [w for _, w in VOCAB[role]]
-    names = []
-    for s in steps:
-        i = next(i for i, (hi, _) in enumerate(VOCAB[role]) if s <= hi)
-        if names and words.index(names[-1]) >= i:  # two steps in one band: take the next word
-            i = words.index(names[-1]) + 1
-        names.append(words[min(i, len(words) - 1)])
-    return names
+    """One distinct word per step, each as close to its own band as the others allow."""
+    bands, words = VOCAB[role], [w for _, w in VOCAB[role]]
+    idx = []
+    for s in steps:  # ascending; two steps in one band push the later one up a word
+        band = next(i for i, (hi, _) in enumerate(bands) if s <= hi)
+        idx.append(max(band, idx[-1] + 1) if idx else band)
+    for i in range(len(idx) - 1, -1, -1):  # pushed past the top: slide back down, still distinct
+        idx[i] = min(idx[i], len(words) - len(idx) + i)
+    return [words[i] for i in idx]
 
 
 def main():
@@ -71,10 +76,16 @@ def main():
     hits = json.load(open(os.path.join(a.work, "hits.json")))["hits"]
     proposals, ladders = {}, {"cap": a.cap, "top": 30}
     for role in ("surface", "line", "text"):
-        counts = C.Counter(h["v"] for h in hits if h["role"] == role and h["semantic"] and not h["noop"])
+        counts = C.Counter(h["v"] for h in hits
+                           if h["role"] == role and h["semantic"] and not h["noop"] and h["v"] is not None)
         if not counts:
             continue
-        options = [fit(counts, role, k, a.cap) for k in range(1, a.max_k + 1)]
+        # A ladder has at most one step per round value in use, and one name per word in the vocabulary.
+        max_k = min(a.max_k, len(candidates(counts)), len(VOCAB[role]))
+        if max_k == 0:
+            print(f"\n{role}  ({sum(counts.values())} uses): no round value in use, so no ladder; these stay as errors")
+            continue
+        options = [fit(counts, role, k, a.cap) for k in range(1, max_k + 1)]
         rec = next((o for o in options if o["reach"] >= a.min_reach * o["total"]
                     and o["unchanged"] >= a.min_unchanged * o["total"]), options[-1])
         proposals[role] = dict(histogram=sorted(counts.items()), options=options, recommended=len(rec["steps"]))

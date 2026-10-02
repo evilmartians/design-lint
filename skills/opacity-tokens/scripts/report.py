@@ -14,7 +14,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def alpha_key(a):
-    return float(a[1:-1].rstrip("%")) * (1 if a.endswith("%]") else 100) if a.startswith("[") else float(a)
+    try:
+        return float(a[1:-1].rstrip("%")) * (1 if a.endswith("%]") else 100) if a.startswith("[") else float(a)
+    except ValueError:  # `[var(--a)]`: sorts after every number
+        return float("inf")
 
 
 def main():
@@ -35,7 +38,7 @@ def main():
 
     roles = []
     for role in ("surface", "line", "text"):
-        rh = [h for h in hits if h["role"] == role and h["semantic"] and not h["noop"]]
+        rh = [h for h in hits if h["role"] == role and h["semantic"] and not h["noop"] and h["v"] is not None]
         if not lad.get(role) or not rh:
             continue
         steps = []
@@ -64,7 +67,10 @@ def main():
     rem = [h for h in hits if h["reason"] != "fixed"]
     collisions = [dict(cls=h["cls"], file=h["file"]) for h in hits if h["reason"] == "collision"]
 
-    notes = [dict(title="Where the opacity already matched a step, the token renders identically.",
+    regressions = [s["title"] for s in shots if s.get("regression")]
+    notes = [dict(title=f"{len(regressions)} {'story stops' if len(regressions) == 1 else 'stories stop'} rendering after the change.",
+                  body=", ".join(regressions) + ". They render on the base branch and show Storybook's error screen on this one. They are marked as regressions in the screenshots.")] if regressions else []
+    notes += [dict(title="Where the opacity already matched a step, the token renders identically.",
                   body="Tailwind emits the same `color-mix()` for a token defined at N% as for a `/N` modifier, with the same `@supports` fallback. Pixel changes come only from values that moved to a step.")]
     if collisions:
         notes.append(dict(title="Resting and hover states can merge.",
@@ -73,12 +79,16 @@ def main():
                       body="An inline token is substituted where it is used, so it follows a `.dark` class on a wrapper element. A token defined on `:root` would resolve once at the root and stay light inside it."))
     broken = [s["title"] for s in shots if s.get("broken")]
     if broken:
-        notes.append(dict(title=f"{len(broken)} {'story fails' if len(broken) == 1 else 'stories fail'} to render in both builds.",
-                          body=", ".join(broken) + ". They are left out of the counts."))
+        notes.append(dict(title=f"{len(broken)} {'story already fails' if len(broken) == 1 else 'stories already fail'} to render on the base branch.",
+                          body=", ".join(broken) + ". There is nothing to compare against, so they are left out of the counts."))
     flaky = [s["title"] for s in shots if s.get("flaky")]
     if flaky:
         notes.append(dict(title=f"{len(flaky)} {'story renders' if len(flaky) == 1 else 'stories render'} differently on every run.",
                           body=", ".join(flaky) + ". Their diffs are left out because they would show noise, not the change."))
+    failed = [s["title"] for s in shots if s.get("failed")]
+    if failed:
+        notes.append(dict(title=f"{len(failed)} {'story' if len(failed) == 1 else 'stories'} would not load, even on a retry.",
+                          body=", ".join(failed) + ". That points at the machine (a timeout under load), not at the change, so they are left out of the counts. Rerun screens.mjs to cover them."))
     if a.notes:
         notes += json.load(open(a.notes))
 

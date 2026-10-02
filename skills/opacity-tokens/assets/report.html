@@ -81,6 +81,8 @@ ol.plain, ul.plain { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
 .diffs { display: grid; gap: 28px; }
 .diff { background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
 .diff-head { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; justify-content: space-between; }
+.diff.regression { border-color: var(--bad); box-shadow: inset 4px 0 0 var(--bad); }
+.badge { display: inline-block; font: 600 11px/1 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; padding: 4px 6px; border-radius: 4px; background: var(--bad); color: var(--sheet); vertical-align: 2px; }
 .diff-head > * { min-width: 0; overflow-wrap: anywhere; }
 .diff-head h3 { font-size: var(--step-0); }
 .trio { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 10px; }
@@ -244,7 +246,8 @@ dialog#lightbox::backdrop { background: oklch(0.15 0.005 100 / 0.7); }
   $("pairs-h").textContent = `${D.pairs.length} token pairs`;
   const R = D.reasons;
   const fixed = R.fixed, exact = D.pairs.reduce((a, p) => a + p.exact, 0);
-  const shots = D.shots, changed = shots.filter((s) => s.diff !== 0 && !s.broken && !s.flaky && s.crop), same = shots.filter((s) => s.diff === 0 && !s.broken);
+  const shots = D.shots, changed = shots.filter((s) => (s.diff !== 0 || s.regression) && !s.broken && !s.flaky && s.crop),
+    same = shots.filter((s) => s.diff === 0 && !s.broken && !s.regression && !s.failed);
   const stepCount = D.roles.reduce((a, r) => a + r.steps.length, 0);
   const ROLE = {
     surface: { label: "Surfaces", uses: "bg, from / via / to, svg fill" },
@@ -267,7 +270,8 @@ dialog#lightbox::backdrop { background: oklch(0.15 0.005 100 / 0.7); }
     ["collision", "Held back: would merge two states", "var(--ink-2)"],
     ["off-ladder", "Too far from any step", "var(--warn)"],
     ["non-semantic", "Palette / non-theme color", "var(--bad)"],
-  ];
+    ["variable", "Variable opacity (var())", "var(--s4)"],
+  ].filter(([k]) => k === "fixed" || R[k]);
   $("bar").innerHTML = segs.map(([k, , c]) => `<i style="width:${(100 * (R[k] || 0)) / D.before}%;background:${c}"></i>`).join("");
   $("legend").innerHTML = segs.map(([k, l, c]) => `<span><i style="background:${c}"></i>${l} · ${fmt(R[k] || 0)}</span>`).join("");
 
@@ -295,9 +299,10 @@ dialog#lightbox::backdrop { background: oklch(0.15 0.005 100 / 0.7); }
     collision: "Two states of one element would become identical",
     "off-ladder": "Too far from every step (or text would lose contrast)",
     "non-semantic": "Palette or non-theme color (black, white, fuchsia…)",
+    variable: "Opacity set at runtime (`/[var(--…)]`), so no step can be chosen",
   };
   $("why-h").textContent = `Why ${fmt(D.after)} remain`;
-  $("reasons").innerHTML = `<tr><th>Reason</th><th class="num">Uses</th></tr>` + segs.slice(1).map(([k]) => `<tr><td class="wrap">${reasonText[k]}</td><td class="num">${R[k] || 0}</td></tr>`).join("");
+  $("reasons").innerHTML = `<tr><th>Reason</th><th class="num">Uses</th></tr>` + segs.slice(1).map(([k]) => `<tr><td class="wrap">${code(reasonText[k])}</td><td class="num">${R[k] || 0}</td></tr>`).join("");
   $("next").innerHTML = `<tr><th>Token</th><th class="num">Uses</th></tr>` + D.nextPairs.map(([t, n]) => `<tr><td class="mono">${esc(t)}</td><td class="num">${n}</td></tr>`).join("");
   $("remc").innerHTML = `<tr><th>Color</th><th class="num">Uses</th></tr>` + D.remByColor.map(([c, n]) => `<tr><td class="mono">${esc(c)}</td><td class="num">${n}</td></tr>`).join("");
   $("remd").innerHTML = `<tr><th>Directory</th><th class="num">Uses</th></tr>` + D.remDirs.map(([c, n]) => `<tr><td class="mono">${esc(c)}</td><td class="num">${n}</td></tr>`).join("");
@@ -314,7 +319,8 @@ dialog#lightbox::backdrop { background: oklch(0.15 0.005 100 / 0.7); }
   for (const s of D.snapped) (byFile[s.file] ||= []).push(s);
   const LABEL = { before: "Main", after: "Branch", diff: "Diff" };
   const src = (s, k) => IMG[`${s.story}.${k}.webp`] || "";
-  const ordered = changed.sort((a, b) => b.diff - a.diff);
+  // Regressions first: a story the change broke matters more than any tint.
+  const ordered = changed.sort((a, b) => (b.regression ? 1 : 0) - (a.regression ? 1 : 0) || b.diff - a.diff);
   const viewer = (s, i, big) => `<div class="viewer${big ? " big" : ""}" data-mode="slide" data-i="${i}">
       <div class="vbar">
         <div class="tabs" role="group" aria-label="View">${[["slide", "Slider"], ["before", "Main"], ["after", "Branch"], ["diff", "Diff"]].map(([m, l]) => `<button type="button" data-mode="${m}" aria-pressed="${m === "slide"}">${l}</button>`).join("")}</div>
@@ -335,7 +341,8 @@ dialog#lightbox::backdrop { background: oklch(0.15 0.005 100 / 0.7); }
     const why = snaps.length
       ? shown.map((x) => `<span class="from">${esc(x.cls)}</span> → <span class="to">${esc(x.new)}</span>`).join("<br>") + (snaps.length > shown.length ? `<br>…and ${snaps.length - shown.length} more` : "")
       : "No value moved in this file. The change comes from a child component it renders.";
-    return `<article class="diff"><div class="diff-head"><h3>${esc(s.title)}</h3><span class="mono muted">${fmt(s.diff)} px · ${s.files.map(esc).join(", ")}</span></div>
+    const size = s.regression ? "breaks after the change" : s.diff === -1 ? "page size changed" : `${fmt(s.diff)} px`;
+    return `<article class="diff${s.regression ? " regression" : ""}"><div class="diff-head"><h3>${s.regression ? `<span class="badge">Regression</span> ` : ""}${esc(s.title)}</h3><span class="mono muted">${size} · ${s.files.map(esc).join(", ")}</span></div>
       ${viewer(s, i, false)}
       <div class="changes">${why}</div></article>`;
   }).join("");

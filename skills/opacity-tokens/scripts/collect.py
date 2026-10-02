@@ -21,6 +21,17 @@ ROLE = {"bg": "surface", "from": "surface", "via": "surface", "to": "surface", "
 UTIL_RE = re.compile(r"^(!?-?)(" + "|".join(re.escape(u) for u in UTILS) + r")-(.+)$")
 
 
+def parse_alpha(alpha):
+    """Percent for `50`, `[0.5]`, `[50%]`; None for a value only the browser knows (`[var(--a)]`)."""
+    try:
+        if alpha.startswith("["):
+            inner = alpha[1:-1]
+            return round(float(inner[:-1]) if inner.endswith("%") else float(inner) * 100, 2)
+        return round(float(alpha), 2)
+    except ValueError:
+        return None
+
+
 def base_of(cls):
     """The class without its variants: text after the last `:` outside brackets."""
     depth, cut = 0, 0
@@ -112,16 +123,16 @@ def main():
         cls = text.split(" — ")[0]
         file, off, length, line = spans(d, a.format, repo, cache)
         written = open(os.path.join(repo, file), "rb").read()[off:off + length].decode("utf-8", "replace")
-        base_mod = base_of(cls)
+        # Tailwind v4 writes important as a suffix (`bg-x/50!`); the leading form is matched by UTIL_RE.
+        base_mod = base_of(cls).removesuffix("!")
         mm = UTIL_RE.match(base_mod.rsplit("/", 1)[0]) if "/" in base_mod else None
         if written != cls or not mm:
             skipped += 1
             continue
         alpha = base_mod.rsplit("/", 1)[1]
-        v = float(alpha[1:-1].rstrip("%")) * (1 if alpha.endswith("%]") else 100) if alpha.startswith("[") else float(alpha)
         util, color = mm.group(2), mm.group(3)
         hits.append(dict(file=file, off=off, len=length, line=line, cls=cls, util=util, color=color,
-                         alpha=alpha, v=round(v, 2), role=ROLE.get(util, "line"), semantic=color in tokens,
+                         alpha=alpha, v=parse_alpha(alpha), role=ROLE.get(util, "line"), semantic=color in tokens,
                          noop="changes nothing" in text))
     os.makedirs(a.out, exist_ok=True)
     json.dump(dict(hits=hits, tokens=tokens, inlineBlock=inline_block, otherRules=dict(other)),
@@ -130,9 +141,10 @@ def main():
           + (f" ({skipped} skipped: span did not match the reported class)" if skipped else ""))
     print(f"{len(tokens)} colour tokens; new tokens go into: {inline_block or 'NO @theme inline block found'}")
     for role in ("surface", "line", "text"):
-        c = C.Counter(h["v"] for h in hits if h["role"] == role)
+        c = C.Counter(h["v"] for h in hits if h["role"] == role and h["v"] is not None)
         print(f"  {role:8} {sum(c.values()):5}  " + " ".join(f"{v:g}:{n}" for v, n in sorted(c.items())))
-    print(f"  non-theme colours: {sum(not h['semantic'] for h in hits)}   /100 no-ops: {sum(h['noop'] for h in hits)}")
+    print(f"  non-theme colours: {sum(not h['semantic'] for h in hits)}   /100 no-ops: {sum(h['noop'] for h in hits)}"
+          f"   variable alphas: {sum(h['v'] is None for h in hits)}")
 
 
 if __name__ == "__main__":

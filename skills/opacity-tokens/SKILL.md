@@ -60,7 +60,7 @@ Show the user, for every role:
 - the recommended steps with their names
 - the options either side of it, with their "unchanged" and "within reach" percentages
 
-Ask them to accept each ladder or change the steps, the names, or `top`. Names must differ across roles and must not clash with existing token suffixes such as `-foreground`. Write their answer to `ladders.json`.
+Ask them to accept each ladder or change the steps, the names, or `top`. Write their answer to `ladders.json`. Every name must be unique across all three roles, because it becomes the token suffix; plan.py stops on a repeated name or on a token that already exists.
 
 Done when the user has explicitly accepted every role's steps and names. Steps 5 and later change hundreds of files, so they wait for this.
 
@@ -71,7 +71,7 @@ python3 $SKILL/scripts/plan.py $W            # prints fixed / remaining and ever
 python3 $SKILL/scripts/apply.py $W <worktree>
 ```
 
-plan.py leaves a hit as an error when two different opacities of one color on one line, such as a resting state and its hover, would snap to the same step. The state would disappear otherwise. It also stops if a new token name already exists in the theme; rename the step in `ladders.json` and rerun it.
+plan.py leaves a hit as an error when two different opacities of one color on one line, such as a resting state and its hover, would snap to the same step. The state would disappear otherwise. Opacities set at runtime (`/[var(--a)]`) also stay as errors, since no step can be chosen for them. If plan.py stops on a name, rename that step in `ladders.json` and rerun it.
 
 Then lint the worktree again and record the remaining `no-opacity-modifier` count. Run the checks the project's `package.json` defines: typecheck, lint, any design gates. Run the formatter only on files that were already formatted on the base branch, because otherwise it reformats unrelated code and buries the change. Done when the remaining count is known and every check passes. Fix or report any that fail.
 
@@ -86,9 +86,9 @@ npm i --prefix $W/tools playwright pngjs pixelmatch sharp
 node $SKILL/scripts/screens.mjs --work $W --before $W/sb-before --after $W/sb-after --repo <worktree> --tools $W/tools
 ```
 
-screens.mjs finds every story that covers a changed file and renders it on both sides, 1200px wide with animations off. A story that differs is rendered again on the "before" side to prove the difference is real, then re-shot at 2× and cropped around the changed pixels. Stories that show Storybook's error screen are set aside. It uses the local Chrome, or `npx playwright install chromium` if Chrome is missing.
+screens.mjs finds every story that covers a changed file and renders it on both sides, 1200px wide with animations off. Each capture waits until two consecutive screenshots are identical, because a fixed wait under load catches pages before late content lands. A story that differs is rendered again on the "before" side to prove the difference is real, then re-shot at 2× and cropped around the changed pixels. A story that never settles, or renders differently on its own, is marked flaky and its diff left out. A story that renders before but shows Storybook's error screen after is a **regression**. A story already failing before is set aside as broken. A story that will not load at all, even on a retry, is counted as failed to load and makes no claim either way; rerun the script to cover it. It uses the local Chrome, or `npx playwright install chromium` if Chrome is missing.
 
-Done when it prints the changed / same / broken / flaky counts. Skip this step for a repo without Storybook; the report then leaves out the screenshot section.
+Done when it prints its counts and the regression count is zero. For each regression, open the story in the "after" build, find which rewritten class broke it, and fix it or put that class back to its `/N` form. Then rebuild "after" and rerun. If the user wants to keep a regression for now, the report shows it first, flagged. Skip this step for a repo without Storybook; the report then leaves out the screenshot section.
 
 ### 7. Report
 

@@ -23,7 +23,15 @@ def main():
     lad = json.load(open(os.path.join(work, "ladders.json")))
     hits, tokens, cap, top_n = src["hits"], src["tokens"], lad.get("cap", 1.0), lad.get("top", 30)
 
+    # A name is the token suffix, so it must mean one step: a repeat would merge two alphas into one token.
+    named = C.Counter(n for role in ("surface", "line", "text") for _, n in lad.get(role, []))
+    repeated = [n for n, k in named.items() if k > 1]
+    if repeated:
+        sys.exit("Step names must be unique across all roles; rename in ladders.json: " + ", ".join(repeated))
+
     def snap(v, role):
+        if v is None:
+            return None
         steps = [s for s in lad.get(role, []) if role != "text" or s[0] >= v]
         if not steps or not 0 < v < 100:
             return None
@@ -37,6 +45,9 @@ def main():
             continue
         if not h["semantic"]:
             h["reason"] = "non-semantic"
+            continue
+        if h["v"] is None:
+            h["reason"] = "variable"  # `/[var(--a)]`: the alpha is decided at runtime, not here
             continue
         s = snap(h["v"], h["role"])
         if s:
@@ -56,7 +67,8 @@ def main():
                 h["reason"], h["step"], h["name"] = "collision", None, None
 
     pairs = C.Counter((h["color"], h["name"]) for h in hits if h["reason"] == "candidate")
-    top = [list(p) for p, _ in pairs.most_common(top_n)]
+    # Ties broken by name, not by lint output order (Oxlint's varies run to run).
+    top = [list(p) for p, _ in sorted(pairs.items(), key=lambda kv: (-kv[1], kv[0]))[:top_n]]
     clash = [f"{c}-{n}" for c, n in top if f"{c}-{n}" in tokens]
     if clash:
         sys.exit("These new token names already exist in the theme; rename the step(s) in ladders.json: "
@@ -65,11 +77,14 @@ def main():
     for h in hits:
         if h["reason"] == "candidate":
             h["reason"] = "fixed" if (h["color"], h["name"]) in chosen else "not-top"
+        # Keep a v4 trailing `!` (`bg-x/50!` → `bg-x-veil!`); a leading one stays in front by itself.
+        bang = "!" if h["cls"].endswith("!") else ""
+        stem = h["cls"].removesuffix("!").rsplit("/", 1)[0]
         if h["reason"] == "noop":
             h["reason"] = "fixed"
-            h["new"] = h["cls"].rsplit("/", 1)[0]
+            h["new"] = stem + bang
         elif h["reason"] == "fixed":
-            h["new"] = h["cls"].rsplit("/", 1)[0] + "-" + h["name"]
+            h["new"] = stem + "-" + h["name"] + bang
 
     step_of = {n: s for role in ("surface", "line", "text") for s, n in lad.get(role, [])}
     new_tokens = [dict(token=f"{c}-{n}", color=c, name=n, step=step_of[n], value=tokens[c]) for c, n in top]
