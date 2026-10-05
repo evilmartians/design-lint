@@ -5,9 +5,9 @@ import { parseDirectives } from "./directives.js";
  * The integration report: how much of design-lint a project actually runs.
  *
  * A clean lint run says nothing about what was switched off to get there. This collects the
- * four places coverage is given up — rules turned off in the config, disable comments in
- * the code, violations recorded in Oxlint's bulk suppressions file, and paths the config
- * keeps from the linter — so they can be seen in one place.
+ * places coverage is given up — rules turned off in the config, violations silenced by
+ * disable comments or Oxlint's bulk suppressions file, and paths the config keeps from the
+ * linter — so they can be seen in one place.
  *
  * Everything here is a function of the config object, the file texts and the suppressions.
  * Finding the config, asking Oxlint which files it lints, and reading them is the CLI's job.
@@ -34,26 +34,37 @@ export function buildReport({ config, files, suppressions = {} }) {
     return OFF.has(severity) ? [{ id, reason: "off" }] : [];
   });
 
-  // Keyed by the name as written, so a comment naming a rule that does not exist — a typo,
-  // or a rule since renamed — is still counted and visible rather than dropped.
+  // Disable comments and bulk suppressions hide violations alike, so they are counted
+  // together: how a rule was silenced matters less than how often. Keyed by the name as
+  // written, so a comment naming a rule that does not exist — a typo, or a rule since
+  // renamed — is still counted and visible rather than dropped.
   const byRule = new Map();
-  let total = 0;
+  const add = (rule, n) => {
+    const id = rule.slice(namespace.length + 1);
+    byRule.set(id, (byRule.get(id) ?? 0) + n);
+  };
   let bare = 0;
 
   for (const { text } of files) {
     for (const directive of parseDirectives(text)) {
       const ours = directive.rules.filter((rule) => rule.startsWith(`${namespace}/`));
       if (directive.rules.length > 0 && ours.length === 0) continue;
-
-      total++;
       if (ours.length === 0) bare++;
-      for (const rule of ours) {
-        const id = rule.slice(namespace.length + 1);
-        byRule.set(id, (byRule.get(id) ?? 0) + 1);
-      }
+      for (const rule of ours) add(rule, 1);
     }
   }
 
+  // As `oxlint --suppress-all` writes them: `{ [path]: { [rule]: { count } } }`, paths
+  // relative to where it runs. An entry for a file Oxlint does not lint hides nothing.
+  const linted = new Set(files.map(({ path }) => path));
+  for (const [path, entries] of Object.entries(suppressions)) {
+    if (!linted.has(path)) continue;
+    for (const [rule, { count = 0 } = {}] of Object.entries(entries ?? {})) {
+      if (rule.startsWith(`${namespace}/`) && count > 0) add(rule, count);
+    }
+  }
+
+  const sorted = [...byRule].sort(([a, x], [b, y]) => y - x || a.localeCompare(b));
   return {
     pluginLoaded: (config.jsPlugins ?? []).some(
       (plugin) => (typeof plugin === "string" ? plugin : plugin?.specifier) === PLUGIN,
@@ -61,44 +72,12 @@ export function buildReport({ config, files, suppressions = {} }) {
     namespace,
     ruleCount: Object.keys(rules).length,
     disabled,
-    comments: {
-      byRule: [...byRule].sort(([a, x], [b, y]) => y - x || a.localeCompare(b)),
+    silenced: {
+      byRule: sorted,
       bare,
-      total,
+      total: sorted.reduce((sum, [, n]) => sum + n, bare),
     },
-    suppressions: countSuppressions(suppressions, files, namespace),
     ignorePatterns: config.ignorePatterns ?? [],
-  };
-}
-
-/**
- * The design violations `oxlint --suppress-all` recorded, as Oxlint writes them:
- * `{ [path]: { [rule]: { count } } }`, paths relative to where it runs. An entry for a file
- * Oxlint does not lint hides nothing, so only linted files count, as with comments.
- */
-function countSuppressions(suppressions, files, namespace) {
-  const linted = new Set(files.map(({ path }) => path));
-  const byRule = new Map();
-  let total = 0;
-  let fileCount = 0;
-
-  for (const [path, entries] of Object.entries(suppressions)) {
-    if (!linted.has(path)) continue;
-    let inFile = 0;
-    for (const [rule, { count = 0 } = {}] of Object.entries(entries ?? {})) {
-      if (!rule.startsWith(`${namespace}/`) || count <= 0) continue;
-      const id = rule.slice(namespace.length + 1);
-      byRule.set(id, (byRule.get(id) ?? 0) + count);
-      inFile += count;
-    }
-    total += inFile;
-    if (inFile > 0) fileCount++;
-  }
-
-  return {
-    byRule: [...byRule].sort(([a, x], [b, y]) => y - x || a.localeCompare(b)),
-    files: fileCount,
-    total,
   };
 }
 
@@ -117,7 +96,7 @@ function namespaceOf(configured) {
 
 /** The report as text, for a terminal. */
 export function renderReport(report, { configPath } = {}) {
-  const { disabled, comments, suppressions, ignorePatterns } = report;
+  const { disabled, silenced, ignorePatterns } = report;
   const out = [`design-lint report — ${configPath ?? "oxlint config"}`, ""];
 
   if (!report.pluginLoaded) {
@@ -128,31 +107,19 @@ export function renderReport(report, { configPath } = {}) {
   out.push(...table(disabled.map(({ id, reason }) => [id, reason])));
   out.push("");
 
-  out.push(`Disable comments (${comments.total})`);
+  out.push(`Silenced (${silenced.total})`);
   out.push(
     ...table([
-      ...comments.byRule.map(([id, n]) => [id, String(n)]),
-      ...(comments.bare > 0 ? [["(all rules, none named)", String(comments.bare)]] : []),
+      ...silenced.byRule.map(([id, n]) => [id, String(n)]),
+      ...(silenced.bare > 0 ? [["(all rules, none named)", String(silenced.bare)]] : []),
     ]),
   );
-  out.push("");
-
-  out.push(
-    suppressions.total > 0
-      ? `Bulk suppressions (${suppressions.total} in ${plural(suppressions.files, "file")})`
-      : "Bulk suppressions (0)",
-  );
-  out.push(...table(suppressions.byRule.map(([id, n]) => [id, String(n)])));
   out.push("");
 
   out.push("Ignored paths (ignorePatterns)");
   out.push(...table(ignorePatterns.map((pattern) => [pattern])));
 
   return `${out.join("\n")}\n`;
-}
-
-function plural(n, word) {
-  return `${n} ${word}${n === 1 ? "" : "s"}`;
 }
 
 function table(rows) {

@@ -9,8 +9,8 @@ import { buildReport, renderReport } from "./report/index.js";
 const USAGE = `Usage: design-lint report [-c <oxlint config>] [PATH]...
 
 Prints what a project's design-lint setup leaves unchecked: design rules that are off,
-disable comments that silence them, violations recorded in oxlint-suppressions.json,
-and the config's ignorePatterns.
+violations silenced by disable comments or oxlint-suppressions.json, and the config's
+ignorePatterns.
 
 Run it from where you run oxlint, with the same config and paths.
 

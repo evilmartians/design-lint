@@ -3,8 +3,11 @@
 ## 0.1.5
 
 - `design-lint report` counts bulk suppressions: the design violations
-  `oxlint --suppress-all` recorded in `oxlint-suppressions.json`, by rule. A project that
-  baselines its violations there no longer looks fully covered in the report.
+  `oxlint --suppress-all` recorded in `oxlint-suppressions.json`. A project that baselines
+  its violations there no longer looks fully covered in the report. They are added to
+  disable comments in one section, **Silenced**, with one number per rule; the
+  **Disable comments** section is gone. A comment naming two rules now counts once per
+  rule in the total, too.
 
 ## 0.1.4
 
