@@ -109,18 +109,20 @@ design-lint report — oxlint.config.ts
 Disabled rules (1 of 9)
   no-opacity-modifier  off
 
-Disable comments (7)
-  no-raw-color             4
+Silenced (49)
+  no-raw-color             34
+  no-dark-variant          12
   no-spectral-color        2
   (all rules, none named)  1
 
-Ignored paths (ignorePatterns)
-  src/legacy/**
+Ignored paths (2)
+  src/legacy/**      ignorePatterns
+  src/brand/art.tsx  no-raw-color
 ```
 
 - **Disabled rules** are rules turned `off` in your config, or never turned on. For example, `componentSources: []` leaves out `no-component-color-override`.
-- **Disable comments** is the number of `oxlint-disable*` and `eslint-disable*` comments that silence design rules, broken down by rule. A comment that names no rule silences every rule, so it gets its own line. A comment that names two rules counts once in the total and once under each rule. Only files Oxlint lints are scanned.
-- **Ignored paths** are the config's `ignorePatterns`.
+- **Silenced** adds line-disable rule mentions to recorded bulk suppression counts, broken down by rule, in files Oxlint lints. Each `oxlint-disable-line`, `oxlint-disable-next-line`, or equivalent `eslint-` comment contributes one per named design rule. A comment naming no rules contributes one on its own line. Bulk counts come from `oxlint-suppressions.json`, read from the directory Oxlint runs in. The total is an indicator of suppression use: a line comment can hide several violations or none, and recorded bulk counts can become stale.
+- **Ignored paths** lists the config's `ignorePatterns` and files containing a block `/* oxlint-disable */` or `/* eslint-disable */` comment. Comment entries show the design rules named, or "all rules" when none are named. A block disable can cover only part of a file, for example when followed by an enable comment; its entry does not mean the entire file is unchecked.
 
 It reads `oxlint.config.ts` the way Oxlint finds it. Pass `--config <file>` and paths to match how you run `oxlint`.
 

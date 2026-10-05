@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.5
+
+- `design-lint report` counts bulk suppressions: the design violations
+  `oxlint --suppress-all` recorded in `oxlint-suppressions.json`. A project that baselines
+  its violations there no longer looks fully covered in the report. They are added to
+  line disable comments in one section, **Silenced**, with one number per rule; the
+  **Disable comments** section is gone. A comment naming two rules now counts once per
+  rule in the total, too.
+- A block `/* oxlint-disable */` or `/* eslint-disable */` comment silences the rest of the
+  file, so the report lists its file under **Ignored paths**, next to `ignorePatterns`, with
+  the rules it names.
+
 ## 0.1.4
 
 - The rules load under ESLint 9. ESLint freezes the context it hands a rule, and every rule
