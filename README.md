@@ -115,13 +115,14 @@ Silenced (49)
   no-spectral-color        2
   (all rules, none named)  1
 
-Ignored paths (ignorePatterns)
-  src/legacy/**
+Ignored paths (2)
+  src/legacy/**      ignorePatterns
+  src/brand/art.tsx  no-raw-color
 ```
 
 - **Disabled rules** are rules turned `off` in your config, or never turned on. For example, `componentSources: []` leaves out `no-component-color-override`.
-- **Silenced** is the number of design-rule violations hidden in code Oxlint lints, broken down by rule. It adds up `oxlint-disable*` and `eslint-disable*` comments that name a design rule and the violations `oxlint --suppress-all` recorded in `oxlint-suppressions.json`. A comment that names two rules counts under each rule. A comment that names no rule silences every rule, so it gets its own line. Oxlint reads `oxlint-suppressions.json` from the directory it runs in, and so does the report.
-- **Ignored paths** are the config's `ignorePatterns`.
+- **Silenced** is the number of single design-rule violations hidden in code Oxlint lints, broken down by rule. It adds up line comments (`oxlint-disable-line`, `oxlint-disable-next-line` and their `eslint-` spellings) that name a design rule, and the violations `oxlint --suppress-all` recorded in `oxlint-suppressions.json`. A comment that names two rules counts under each rule. A comment that names no rule silences every rule, so it gets its own line. Oxlint reads `oxlint-suppressions.json` from the directory it runs in, and so does the report.
+- **Ignored paths** are whole files and paths left unchecked: the config's `ignorePatterns`, and files with a block `/* oxlint-disable */` or `/* eslint-disable */` comment, listed with the design rules it names, or "all rules" when it names none.
 
 It reads `oxlint.config.ts` the way Oxlint finds it. Pass `--config <file>` and paths to match how you run `oxlint`.
 

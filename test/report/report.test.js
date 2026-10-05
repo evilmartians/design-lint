@@ -63,7 +63,7 @@ describe("buildReport", () => {
     ]);
   });
 
-  it("counts comments naming design rules and bare ones, never other rules'", () => {
+  it("counts line comments naming design rules and bare ones, never other rules'", () => {
     const files = [
       {
         path: "a.tsx",
@@ -80,12 +80,28 @@ describe("buildReport", () => {
     const { silenced } = buildReport({ config: { rules: allOn() }, files });
     expect(silenced).toEqual({
       byRule: [
-        ["no-raw-color", 2],
+        ["no-raw-color", 1],
         ["no-raw-colour", 1],
       ],
       bare: 1,
-      total: 4,
+      total: 3,
     });
+  });
+
+  it("lists files a block disable comment covers with the ignored paths", () => {
+    const files = [
+      { path: "b.tsx", text: "/* eslint-disable design/no-raw-color */\n/* oxlint-disable design/no-dark-variant */" },
+      { path: "a.tsx", text: "/* eslint-disable design/no-raw-color */\n/* eslint-disable */" },
+      { path: "c.tsx", text: "/* eslint-disable no-console */" },
+    ];
+
+    const report = buildReport({ config: { rules: allOn(), ignorePatterns: ["src/legacy/**"] }, files });
+    expect(report.silenced.total).toBe(0);
+    expect(report.ignored).toEqual([
+      { path: "src/legacy/**", rules: null, by: "ignorePatterns" },
+      { path: "a.tsx", rules: null, by: "comment" },
+      { path: "b.tsx", rules: ["no-dark-variant", "no-raw-color"], by: "comment" },
+    ]);
   });
 
   it("reads the namespace back from the configured rules", () => {
@@ -130,7 +146,11 @@ describe("renderReport", () => {
     const configured = { ...allOn(), "design/no-opacity-modifier": "off" };
     const report = buildReport({
       config: { jsPlugins: [PLUGIN], rules: configured, ignorePatterns: ["src/legacy/**"] },
-      files: [{ path: "a.tsx", text: "// eslint-disable-next-line design/no-raw-color\n// eslint-disable-line" }],
+      files: [
+        { path: "a.tsx", text: "// eslint-disable-next-line design/no-raw-color\n// eslint-disable-line" },
+        { path: "b.tsx", text: "/* eslint-disable design/no-raw-color, design/no-dark-variant */" },
+        { path: "c.tsx", text: "/* oxlint-disable */" },
+      ],
       suppressions: { "a.tsx": { "design/no-spectral-color": { count: 4 } } },
     });
 
@@ -146,8 +166,10 @@ describe("renderReport", () => {
         "  no-raw-color             1",
         "  (all rules, none named)  1",
         "",
-        "Ignored paths (ignorePatterns)",
-        "  src/legacy/**",
+        "Ignored paths (3)",
+        "  src/legacy/**  ignorePatterns",
+        "  b.tsx          no-dark-variant, no-raw-color",
+        "  c.tsx          all rules",
         "",
       ].join("\n"),
     );
@@ -194,7 +216,7 @@ export default { meta: { name: "design" }, rules: Object.fromEntries(${JSON.stri
     expect(output).toContain("design-lint report — oxlint.config.ts");
     expect(output).toContain("Disabled rules (1 of 9)\n  no-dark-variant  off");
     expect(output).toContain("Silenced (1)\n  no-raw-color  1");
-    expect(output).toContain("Ignored paths (ignorePatterns)\n  src/legacy/**");
+    expect(output).toContain("Ignored paths (1)\n  src/legacy/**  ignorePatterns");
   });
 
   it("counts oxlint-suppressions.json from where it runs", () => {

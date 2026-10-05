@@ -5,9 +5,9 @@ import { parseDirectives } from "./directives.js";
  * The integration report: how much of design-lint a project actually runs.
  *
  * A clean lint run says nothing about what was switched off to get there. This collects the
- * places coverage is given up — rules turned off in the config, violations silenced by
- * disable comments or Oxlint's bulk suppressions file, and paths the config keeps from the
- * linter — so they can be seen in one place.
+ * places coverage is given up — rules turned off in the config, single violations silenced
+ * by line comments or Oxlint's bulk suppressions file, and whole files kept from the linter
+ * by `ignorePatterns` or a file-wide disable comment — so they can be seen in one place.
  *
  * Everything here is a function of the config object, the file texts and the suppressions.
  * Finding the config, asking Oxlint which files it lints, and reading them is the CLI's job.
@@ -34,10 +34,10 @@ export function buildReport({ config, files, suppressions = {} }) {
     return OFF.has(severity) ? [{ id, reason: "off" }] : [];
   });
 
-  // Disable comments and bulk suppressions hide violations alike, so they are counted
-  // together: how a rule was silenced matters less than how often. Keyed by the name as
-  // written, so a comment naming a rule that does not exist — a typo, or a rule since
-  // renamed — is still counted and visible rather than dropped.
+  // What hides single violations — line comments and bulk suppressions — is counted together:
+  // how a rule was silenced matters less than how often. Keyed by the name as written, so a
+  // comment naming a rule that does not exist — a typo, or a rule since renamed — is still
+  // counted and visible rather than dropped.
   const byRule = new Map();
   const add = (rule, n) => {
     const id = rule.slice(namespace.length + 1);
@@ -45,10 +45,22 @@ export function buildReport({ config, files, suppressions = {} }) {
   };
   let bare = 0;
 
-  for (const { text } of files) {
+  // A block `disable` comment silences the rest of the file, so it is reported with the
+  // paths the config ignores, as the file it covers. `null` stands for every rule.
+  const ignoredFiles = new Map();
+
+  for (const { path, text } of files) {
     for (const directive of parseDirectives(text)) {
       const ours = directive.rules.filter((rule) => rule.startsWith(`${namespace}/`));
       if (directive.rules.length > 0 && ours.length === 0) continue;
+
+      if (directive.kind === "disable") {
+        const known = ignoredFiles.has(path) ? ignoredFiles.get(path) : new Set();
+        if (known === null || ours.length === 0) ignoredFiles.set(path, null);
+        else ignoredFiles.set(path, new Set([...known, ...ours.map((rule) => rule.slice(namespace.length + 1))]));
+        continue;
+      }
+
       if (ours.length === 0) bare++;
       for (const rule of ours) add(rule, 1);
     }
@@ -77,7 +89,12 @@ export function buildReport({ config, files, suppressions = {} }) {
       bare,
       total: sorted.reduce((sum, [, n]) => sum + n, bare),
     },
-    ignorePatterns: config.ignorePatterns ?? [],
+    ignored: [
+      ...(config.ignorePatterns ?? []).map((path) => ({ path, rules: null, by: "ignorePatterns" })),
+      ...[...ignoredFiles]
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([path, ids]) => ({ path, rules: ids && [...ids].sort(), by: "comment" })),
+    ],
   };
 }
 
@@ -96,7 +113,7 @@ function namespaceOf(configured) {
 
 /** The report as text, for a terminal. */
 export function renderReport(report, { configPath } = {}) {
-  const { disabled, silenced, ignorePatterns } = report;
+  const { disabled, silenced, ignored } = report;
   const out = [`design-lint report — ${configPath ?? "oxlint config"}`, ""];
 
   if (!report.pluginLoaded) {
@@ -116,8 +133,15 @@ export function renderReport(report, { configPath } = {}) {
   );
   out.push("");
 
-  out.push("Ignored paths (ignorePatterns)");
-  out.push(...table(ignorePatterns.map((pattern) => [pattern])));
+  out.push(`Ignored paths (${ignored.length})`);
+  out.push(
+    ...table(
+      ignored.map(({ path, rules: ids, by }) => [
+        path,
+        by === "ignorePatterns" ? "ignorePatterns" : ids ? ids.join(", ") : "all rules",
+      ]),
+    ),
+  );
 
   return `${out.join("\n")}\n`;
 }
