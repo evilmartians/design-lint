@@ -1,0 +1,19 @@
+README.md
+  s_858eee9574f677::t_95c4048ca31dae 124-125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9d36727cfd69db7a427e249c3d01cc3cfc96ed25",
+  "prompts": {},
+  "sessions": {
+    "s_858eee9574f677": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a10b2a-6646-74a1-9322-0ec0a1cf9129",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
