@@ -114,12 +114,17 @@ Disable comments (7)
   no-spectral-color        2
   (all rules, none named)  1
 
+Bulk suppressions (42 in 9 files)
+  no-raw-color     30
+  no-dark-variant  12
+
 Ignored paths (ignorePatterns)
   src/legacy/**
 ```
 
 - **Disabled rules** are rules turned `off` in your config, or never turned on. For example, `componentSources: []` leaves out `no-component-color-override`.
 - **Disable comments** is the number of `oxlint-disable*` and `eslint-disable*` comments that silence design rules, broken down by rule. A comment that names no rule silences every rule, so it gets its own line. A comment that names two rules counts once in the total and once under each rule. Only files Oxlint lints are scanned.
+- **Bulk suppressions** are the design violations recorded in `oxlint-suppressions.json` by `oxlint --suppress-all`, broken down by rule. Oxlint reads that file from the directory it runs in, and so does the report. Entries for files Oxlint does not lint are not counted.
 - **Ignored paths** are the config's `ignorePatterns`.
 
 It reads `oxlint.config.ts` the way Oxlint finds it. Pass `--config <file>` and paths to match how you run `oxlint`.

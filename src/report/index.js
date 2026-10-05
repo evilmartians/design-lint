@@ -5,11 +5,12 @@ import { parseDirectives } from "./directives.js";
  * The integration report: how much of design-lint a project actually runs.
  *
  * A clean lint run says nothing about what was switched off to get there. This collects the
- * three places coverage is given up — rules turned off in the config, disable comments in
- * the code, and paths the config keeps from the linter — so they can be seen in one place.
+ * four places coverage is given up — rules turned off in the config, disable comments in
+ * the code, violations recorded in Oxlint's bulk suppressions file, and paths the config
+ * keeps from the linter — so they can be seen in one place.
  *
- * Everything here is a function of the config object and the file texts. Finding the config,
- * asking Oxlint which files it lints, and reading them is the CLI's job.
+ * Everything here is a function of the config object, the file texts and the suppressions.
+ * Finding the config, asking Oxlint which files it lints, and reading them is the CLI's job.
  */
 
 export const PLUGIN = "@evilmartians/design-lint/oxlint";
@@ -17,11 +18,12 @@ export const PLUGIN = "@evilmartians/design-lint/oxlint";
 const OFF = new Set(["off", "allow", 0]);
 
 /**
- * @param {{ config: object, files: { path: string, text: string }[] }} input
+ * @param {{ config: object, files: { path: string, text: string }[], suppressions?: object }} input
  *   `config` is the object the project's `oxlint.config.ts` exports; `files` are the files
- *   Oxlint lints with it.
+ *   Oxlint lints with it; `suppressions` is the parsed `oxlint-suppressions.json`, if there
+ *   is one.
  */
-export function buildReport({ config, files }) {
+export function buildReport({ config, files, suppressions = {} }) {
   const configured = config.rules ?? {};
   const namespace = namespaceOf(configured);
 
@@ -64,7 +66,39 @@ export function buildReport({ config, files }) {
       bare,
       total,
     },
+    suppressions: countSuppressions(suppressions, files, namespace),
     ignorePatterns: config.ignorePatterns ?? [],
+  };
+}
+
+/**
+ * The design violations `oxlint --suppress-all` recorded, as Oxlint writes them:
+ * `{ [path]: { [rule]: { count } } }`, paths relative to where it runs. An entry for a file
+ * Oxlint does not lint hides nothing, so only linted files count, as with comments.
+ */
+function countSuppressions(suppressions, files, namespace) {
+  const linted = new Set(files.map(({ path }) => path));
+  const byRule = new Map();
+  let total = 0;
+  let fileCount = 0;
+
+  for (const [path, entries] of Object.entries(suppressions)) {
+    if (!linted.has(path)) continue;
+    let inFile = 0;
+    for (const [rule, { count = 0 } = {}] of Object.entries(entries ?? {})) {
+      if (!rule.startsWith(`${namespace}/`) || count <= 0) continue;
+      const id = rule.slice(namespace.length + 1);
+      byRule.set(id, (byRule.get(id) ?? 0) + count);
+      inFile += count;
+    }
+    total += inFile;
+    if (inFile > 0) fileCount++;
+  }
+
+  return {
+    byRule: [...byRule].sort(([a, x], [b, y]) => y - x || a.localeCompare(b)),
+    files: fileCount,
+    total,
   };
 }
 
@@ -83,7 +117,7 @@ function namespaceOf(configured) {
 
 /** The report as text, for a terminal. */
 export function renderReport(report, { configPath } = {}) {
-  const { disabled, comments, ignorePatterns } = report;
+  const { disabled, comments, suppressions, ignorePatterns } = report;
   const out = [`design-lint report — ${configPath ?? "oxlint config"}`, ""];
 
   if (!report.pluginLoaded) {
@@ -103,10 +137,22 @@ export function renderReport(report, { configPath } = {}) {
   );
   out.push("");
 
+  out.push(
+    suppressions.total > 0
+      ? `Bulk suppressions (${suppressions.total} in ${plural(suppressions.files, "file")})`
+      : "Bulk suppressions (0)",
+  );
+  out.push(...table(suppressions.byRule.map(([id, n]) => [id, String(n)])));
+  out.push("");
+
   out.push("Ignored paths (ignorePatterns)");
   out.push(...table(ignorePatterns.map((pattern) => [pattern])));
 
   return `${out.join("\n")}\n`;
+}
+
+function plural(n, word) {
+  return `${n} ${word}${n === 1 ? "" : "s"}`;
 }
 
 function table(rows) {

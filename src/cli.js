@@ -9,7 +9,8 @@ import { buildReport, renderReport } from "./report/index.js";
 const USAGE = `Usage: design-lint report [-c <oxlint config>] [PATH]...
 
 Prints what a project's design-lint setup leaves unchecked: design rules that are off,
-disable comments that silence them, and the config's ignorePatterns.
+disable comments that silence them, violations recorded in oxlint-suppressions.json,
+and the config's ignorePatterns.
 
 Run it from where you run oxlint, with the same config and paths.
 
@@ -22,6 +23,8 @@ Run it from where you run oxlint, with the same config and paths.
  * `designLint()` to have resolved the design system first, so it is not looked for.
  */
 const CONFIG_NAMES = ["oxlint.config.ts", "oxlint.config.mts"];
+
+const SUPPRESSIONS = "oxlint-suppressions.json";
 
 async function main(argv) {
   const [command, ...rest] = argv;
@@ -63,7 +66,9 @@ async function main(argv) {
   }));
 
   process.stdout.write(
-    renderReport(buildReport({ config, files }), { configPath: relative(cwd, configPath) }),
+    renderReport(buildReport({ config, files, suppressions: readSuppressions(cwd) }), {
+      configPath: relative(cwd, configPath),
+    }),
   );
   return 0;
 }
@@ -102,6 +107,20 @@ function lintedFiles(cwd, args) {
     throw new Error(`design-lint: oxlint could not list the files it lints:\n${detail}`);
   }
   return output.split("\n").map((line) => line.trim()).filter(Boolean);
+}
+
+/**
+ * The bulk suppressions `oxlint --suppress-all` wrote. Oxlint reads the file from the
+ * directory it runs in — measured: not the config's directory — so the report does too.
+ */
+function readSuppressions(cwd) {
+  const path = join(cwd, SUPPRESSIONS);
+  if (!existsSync(path)) return {};
+  try {
+    return JSON.parse(readFileSync(path, "utf-8"));
+  } catch (error) {
+    throw new Error(`design-lint: cannot read ${SUPPRESSIONS}: ${error.message}`);
+  }
 }
 
 /** The project's own oxlint, found by walking up from `cwd` as Node would. */

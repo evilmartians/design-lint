@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.5
+
+- `design-lint report` counts bulk suppressions: the design violations
+  `oxlint --suppress-all` recorded in `oxlint-suppressions.json`, by rule. A project that
+  baselines its violations there no longer looks fully covered in the report.
+
 ## 0.1.4
 
 - The rules load under ESLint 9. ESLint freezes the context it hands a rule, and every rule

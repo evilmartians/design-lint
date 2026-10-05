@@ -1,6 +1,6 @@
 {
   "name": "@evilmartians/design-lint",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "description": "Design-token lint rules for Tailwind v4 codebases, for Oxlint and ESLint",
   "bin": {

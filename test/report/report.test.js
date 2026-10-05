@@ -96,6 +96,25 @@ describe("buildReport", () => {
     expect(report.comments.byRule).toEqual([["no-raw-color", 1]]);
   });
 
+  it("counts bulk suppressions of design rules in linted files", () => {
+    const files = [{ path: "src/a.tsx", text: "" }, { path: "src/b.tsx", text: "" }, { path: "src/c.tsx", text: "" }];
+    const suppressions = {
+      "src/a.tsx": { "design/no-raw-color": { count: 3 }, "design/no-dark-variant": { count: 1 } },
+      "src/b.tsx": { "design/no-raw-color": { count: 2 }, "no-console": { count: 5 } },
+      "src/c.tsx": { "no-console": { count: 1 } },
+      "src/gone.tsx": { "design/no-raw-color": { count: 9 } },
+    };
+
+    expect(buildReport({ config: { rules: allOn() }, files, suppressions }).suppressions).toEqual({
+      byRule: [
+        ["no-raw-color", 5],
+        ["no-dark-variant", 1],
+      ],
+      files: 2,
+      total: 6,
+    });
+  });
+
   it("warns when the plugin is not loaded at all", () => {
     const text = renderReport(buildReport({ config: { rules: allOn() }, files: [] }));
     expect(text).toContain(`${PLUGIN} is not in jsPlugins`);
@@ -108,6 +127,7 @@ describe("renderReport", () => {
     const report = buildReport({
       config: { jsPlugins: [PLUGIN], rules: configured, ignorePatterns: ["src/legacy/**"] },
       files: [{ path: "a.tsx", text: "// eslint-disable-next-line design/no-raw-color\n// eslint-disable-line" }],
+      suppressions: { "a.tsx": { "design/no-spectral-color": { count: 4 } } },
     });
 
     expect(renderReport(report, { configPath: "oxlint.config.ts" })).toBe(
@@ -120,6 +140,9 @@ describe("renderReport", () => {
         "Disable comments (2)",
         "  no-raw-color             1",
         "  (all rules, none named)  1",
+        "",
+        "Bulk suppressions (4 in 1 file)",
+        "  no-spectral-color  4",
         "",
         "Ignored paths (ignorePatterns)",
         "  src/legacy/**",
@@ -169,7 +192,20 @@ export default { meta: { name: "design" }, rules: Object.fromEntries(${JSON.stri
     expect(output).toContain("design-lint report — oxlint.config.ts");
     expect(output).toContain("Disabled rules (1 of 9)\n  no-dark-variant  off");
     expect(output).toContain("Disable comments (1)\n  no-raw-color  1");
+    expect(output).toContain("Bulk suppressions (0)\n  none");
     expect(output).toContain("Ignored paths (ignorePatterns)\n  src/legacy/**");
+  });
+
+  it("counts oxlint-suppressions.json from where it runs", () => {
+    const root = project();
+    writeFileSync(
+      join(root, "oxlint-suppressions.json"),
+      JSON.stringify({
+        "src/a.tsx": { "design/no-raw-color": { count: 2 } },
+        "src/legacy/b.tsx": { "design/no-raw-color": { count: 7 } },
+      }),
+    );
+    expect(run(root)).toContain("Bulk suppressions (2 in 1 file)\n  no-raw-color  2");
   });
 
   it("takes an explicit config", () => {
