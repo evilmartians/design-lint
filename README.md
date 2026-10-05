@@ -121,8 +121,8 @@ Ignored paths (2)
 ```
 
 - **Disabled rules** are rules turned `off` in your config, or never turned on. For example, `componentSources: []` leaves out `no-component-color-override`.
-- **Silenced** is the number of single design-rule violations hidden in code Oxlint lints, broken down by rule. It adds up line comments (`oxlint-disable-line`, `oxlint-disable-next-line` and their `eslint-` spellings) that name a design rule, and the violations `oxlint --suppress-all` recorded in `oxlint-suppressions.json`. A comment that names two rules counts under each rule. A comment that names no rule silences every rule, so it gets its own line. Oxlint reads `oxlint-suppressions.json` from the directory it runs in, and so does the report.
-- **Ignored paths** are whole files and paths left unchecked: the config's `ignorePatterns`, and files with a block `/* oxlint-disable */` or `/* eslint-disable */` comment, listed with the design rules it names, or "all rules" when it names none.
+- **Silenced** adds line-disable rule mentions to recorded bulk suppression counts, broken down by rule, in files Oxlint lints. Each `oxlint-disable-line`, `oxlint-disable-next-line`, or equivalent `eslint-` comment contributes one per named design rule. A comment naming no rules contributes one on its own line. Bulk counts come from `oxlint-suppressions.json`, read from the directory Oxlint runs in. The total is an indicator of suppression use: a line comment can hide several violations or none, and recorded bulk counts can become stale.
+- **Ignored paths** lists the config's `ignorePatterns` and files containing a block `/* oxlint-disable */` or `/* eslint-disable */` comment. Comment entries show the design rules named, or "all rules" when none are named. A block disable can cover only part of a file, for example when followed by an enable comment; its entry does not mean the entire file is unchecked.
 
 It reads `oxlint.config.ts` the way Oxlint finds it. Pass `--config <file>` and paths to match how you run `oxlint`.
 
