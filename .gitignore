@@ -1,3 +1,4 @@
 node_modules/
 .claude/worktrees/
 .pack/
+__pycache__/
