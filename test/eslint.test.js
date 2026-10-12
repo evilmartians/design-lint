@@ -42,8 +42,10 @@ describe("the plugin under ESLint", () => {
 
   it("reports through the rules bound to the design system", () => {
     const code = `import { Card } from "@/ui/card";
-<><div className="bg-red-500" /><Card className="bg-primary" /></>;`;
+<><div className="bg-red-500 text-[13px] rounded-[6px]" /><Card className="bg-primary" /></>;`;
     expect(lint(code).map((m) => m.ruleId).sort()).toEqual([
+      "design/no-arbitrary-radius",
+      "design/no-arbitrary-typography",
       "design/no-component-color-override",
       "design/no-spectral-color",
     ]);

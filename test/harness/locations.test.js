@@ -25,6 +25,129 @@ import { optionsFor, ruleFor } from "./options.js";
  * would silently be 0-based.
  */
 export const FIXTURES = {
+  "no-arbitrary-typography": [
+    {
+      name: "each bracketed value, at the class, with a fix only where the theme has the value",
+      code: [
+        'const base = "p-2";',
+        'const label = cva("text-sm", { variants: { size: {',
+        '  tiny: "text-[11px] font-[600]",',
+        "} } });",
+        "<h2",
+        '  className={cn("md:tracking-[0.025em]", base)}',
+        "/>;",
+      ].join("\n"),
+      errors: [
+        // Two classes in one string are two spans. `11px` is no value the theme names — and
+        // `0.6875rem` would not be converted to it if it were — so there is no fix.
+        { messageId: "arbitraryFontSize", line: 3, column: 10, endLine: 3, endColumn: 21, suggestions: [] },
+        {
+          messageId: "arbitraryFontWeight",
+          line: 3,
+          column: 22,
+          endLine: 3,
+          endColumn: 32,
+          suggestions: [
+            {
+              messageId: "useThemeValue",
+              output: [
+                'const base = "p-2";',
+                'const label = cva("text-sm", { variants: { size: {',
+                '  tiny: "text-[11px] font-semibold",',
+                "} } });",
+                "<h2",
+                '  className={cn("md:tracking-[0.025em]", base)}',
+                "/>;",
+              ].join("\n"),
+            },
+          ],
+        },
+        // The fix keeps the variant: only the bracketed value is replaced.
+        {
+          messageId: "arbitraryLetterSpacing",
+          line: 6,
+          column: 18,
+          endLine: 6,
+          endColumn: 39,
+          suggestions: [
+            {
+              messageId: "useThemeValue",
+              output: [
+                'const base = "p-2";',
+                'const label = cva("text-sm", { variants: { size: {',
+                '  tiny: "text-[11px] font-[600]",',
+                "} } });",
+                "<h2",
+                '  className={cn("md:tracking-wide", base)}',
+                "/>;",
+              ].join("\n"),
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  "no-arbitrary-radius": [
+    {
+      name: "each bracketed radius, at the class and not at the string that holds it",
+      code: [
+        'const radius = "p-2";',
+        "<div",
+        '  className="rounded-[0.5rem] p-2"',
+        "/>;",
+        'const corner = { top: "rounded-t-[7px]" };',
+      ].join("\n"),
+      errors: [
+        {
+          messageId: "arbitraryRadius",
+          line: 3,
+          column: 14,
+          endLine: 3,
+          endColumn: 30,
+          suggestions: [
+            {
+              messageId: "useThemeValue",
+              output: [
+                'const radius = "p-2";',
+                "<div",
+                '  className="rounded-lg p-2"',
+                "/>;",
+                'const corner = { top: "rounded-t-[7px]" };',
+              ].join("\n"),
+            },
+          ],
+        },
+        { messageId: "arbitraryRadius", line: 5, column: 24, endLine: 5, endColumn: 39, suggestions: [] },
+      ],
+    },
+  ],
+  "no-ad-hoc-heading": [
+    {
+      name: "one report per element, at its first offending class",
+      code: [
+        'const title = "Settings";',
+        "<section>",
+        "  <h2",
+        "    className={cn(",
+        '      "mb-2",',
+        '      "font-bold",',
+        '      "text-2xl",',
+        "    )}",
+        "  >",
+        "    {title}",
+        "  </h2>",
+        '  <h3 className="heading-3 mt-4">{title}</h3>',
+        '  <div className="heading-6 text-sm uppercase">{title}</div>',
+        "</section>;",
+      ].join("\n"),
+      errors: [
+        // Two classes of its own, one report, at the first of them.
+        { messageId: "handStyledHeading", line: 6, column: 8, endLine: 6, endColumn: 17 },
+        // Line 12 places a heading class, and is silent.
+        { messageId: "headingClassOverride", line: 13, column: 29, endLine: 13, endColumn: 36 },
+      ],
+    },
+  ],
   "no-opacity-modifier": [
     {
       name: "each offending class, at the class and not at the string that holds it",

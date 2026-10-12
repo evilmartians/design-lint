@@ -13,6 +13,9 @@ Design Lint keeps product code aligned with a token-based design system. These r
 | [`no-dark-variant`](./no-dark-variant.md) | Reports local theme branches written with `dark:` or `light-dark()` |
 | [`no-useless-hover`](./no-useless-hover.md) | Reports hover styles on elements that are not interactive |
 | [`no-component-color-override`](./no-component-color-override.md) | Reports color classes passed to design-system components through `className` |
+| [`no-arbitrary-typography`](./no-arbitrary-typography.md) | Reports bracketed font sizes, weights, and letter spacing such as `text-[13px]` |
+| [`no-arbitrary-radius`](./no-arbitrary-radius.md) | Reports bracketed radii such as `rounded-[6px]` |
+| [`no-ad-hoc-heading`](./no-ad-hoc-heading.md) | Reports headings styled by hand instead of with a heading class, and heading classes with their typography changed |
 
 ## The shared idea
 
@@ -23,5 +26,7 @@ The rules cover three common ways this breaks down:
 1. **A color is written directly.** Example: `#ff0000`, `red`, `rgb(...)`.
 2. **A color bypasses the token vocabulary.** Example: `bg-red-500` or `bg-primary/50`.
 3. **A token is used outside its intended role.** Example: `bg-muted-foreground`.
+
+The same idea applies to type and shape. A font size, weight, letter spacing, or radius belongs to a scale in your theme, and a value written in brackets at the call site is a step nobody added to it.
 
 The goal is not to enforce a particular visual style. The goal is to keep design decisions named, searchable, themeable, and reviewable.

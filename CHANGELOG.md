@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.2.0
+
+Three new rules, **turned on** by `designLint()`. Upgrading can fail a build that passed
+on 0.1.x. To adopt them gradually, restate any of them as `"off"` or `"warn"` in your
+config, or record the existing violations with `oxlint --suppress-all`.
+
+- `no-arbitrary-typography` reports a font size, font weight or letter spacing written in
+  brackets — `text-[13px]`, `font-[500]`, `tracking-[0.02em]`, `[font-size:13px]` — where the
+  theme has a scale. A value that reads a CSS variable is allowed. When the value is exactly
+  one the theme names, the class is offered as a suggestion: `font-[600]` → `font-semibold`.
+- `no-arbitrary-radius` does the same for corner radii: `rounded-[6px]`, `rounded-tl-[4px]`,
+  `[border-radius:6px]`. `rounded-[calc(var(--radius)-2px)]` and `rounded-[inherit]` are
+  allowed.
+- `no-ad-hoc-heading` reports an `<h1>`–`<h6>` that sets a font size or a font weight with a
+  class of its own instead of a heading class — `<h2 className="text-xl">` — and any element
+  that changes a heading class's typography: `<div className="heading-1 font-bold">`,
+  `heading-2 md:text-3xl`. Heading classes are the `headingClasses` globs, `["heading-*"]` by
+  default.
+
 ## 0.1.5
 
 - `design-lint report` counts bulk suppressions: the design violations

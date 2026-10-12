@@ -16,7 +16,7 @@ import { rules } from "../../src/rules/index.js";
  *
  * ## Resolved inputs, not paths
  *
- * Five of the nine rules need a design system or a semantic token set. Their contracts
+ * Most rules need a design system or a semantic token set. Their contracts
  * configure that as `tokenFiles` — *paths*, because that is what a consumer
  * has — but no rule may read a file: paths are resolved once at plugin-module load and the
  * rules are handed the result. The corpus is that load step's stand-in, so it supplies the
@@ -199,6 +199,9 @@ const OPTIONS = {
  * system is a fact about the rules rather than about the fixture.
  */
 const RESOLVED = {
+  "no-ad-hoc-heading": { designSystem },
+  "no-arbitrary-radius": { designSystem },
+  "no-arbitrary-typography": { designSystem },
   "no-component-color-override": { designSystem: semanticDesignSystem },
   "no-dark-variant": { designSystem },
   "no-opacity-modifier": { designSystem },

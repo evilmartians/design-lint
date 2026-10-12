@@ -11,7 +11,7 @@ npm test
 | --- | --- |
 | `src/preset/` | `designLint()`, the factory a consumer calls from `oxlint.config.ts`. It performs the package's one filesystem read: it loads the consumer's token stylesheets, resolves the Tailwind design system and the token set, and hands them to the plugin. |
 | `src/oxlint.js` | The plugin Oxlint loads through `jsPlugins`. It binds what the factory resolved to the rules that need it. |
-| `src/rules/` | The nine rules. |
+| `src/rules/` | The rules, one file each, and `arbitrary-value.js`, which two of them share. |
 | `src/cli.js`, `src/report/` | `design-lint report`: reads the consumer's Oxlint config, asks Oxlint which files it lints, and counts what is switched off. |
 | `src/extract/` | Class-string extraction. A broad sweep of every string in the file for the token rules; a precise walk of one element's `className` for the JSX rules. |
 | `src/policy/` | What several rules share: variant parsing, the class tokenizer, colour matching, and the questions asked of the design system and the token set. Exported as `/policy`. |
@@ -28,6 +28,18 @@ project's opinion — which tokens may go on which utilities, which palette fami
 which semantic names, which components own their own colour, whether `dark:` is banned —
 is a rule option with a recommended default. A project shaped differently configures a
 rule rather than forking one.
+
+### No heuristics decide whether a rule reports
+
+A rule does not guess whether a project wants its reports. It never turns itself off, or
+stays quiet, because the project *looks* like one the rule does not fit — a theme that
+seems to lack the classes the rule asks for, say — and it never auto-detects what a
+project's vocabulary is. What a rule looks for is an option with a default. A project
+that does not want the reports disables the rule; a project shaped differently sets the
+option.
+
+The same goes for rules among themselves: each one behaves the same alone as alongside
+the others, and none stays quiet about a case because another rule also reports it.
 
 ### Only the factory reads files
 

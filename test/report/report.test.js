@@ -158,7 +158,7 @@ describe("renderReport", () => {
       [
         "design-lint report — oxlint.config.ts",
         "",
-        "Disabled rules (1 of 9)",
+        "Disabled rules (1 of 12)",
         "  no-opacity-modifier  off",
         "",
         "Silenced (6)",
@@ -214,7 +214,7 @@ export default { meta: { name: "design" }, rules: Object.fromEntries(${JSON.stri
   it("reads the config and counts comments only in files oxlint lints", () => {
     const output = run(project());
     expect(output).toContain("design-lint report — oxlint.config.ts");
-    expect(output).toContain("Disabled rules (1 of 9)\n  no-dark-variant  off");
+    expect(output).toContain("Disabled rules (1 of 12)\n  no-dark-variant  off");
     expect(output).toContain("Silenced (1)\n  no-raw-color  1");
     expect(output).toContain("Ignored paths (1)\n  src/legacy/**  ignorePatterns");
   });
@@ -234,7 +234,7 @@ export default { meta: { name: "design" }, rules: Object.fromEntries(${JSON.stri
   it("takes an explicit config", () => {
     const root = project();
     writeFileSync(join(root, "other.config.ts"), config(allOn()));
-    expect(run(root, "--config", "other.config.ts")).toContain("Disabled rules (0 of 9)\n  none");
+    expect(run(root, "--config", "other.config.ts")).toContain("Disabled rules (0 of 12)\n  none");
   });
 
   it("says where it looked when there is no config", () => {

@@ -21,6 +21,9 @@ import { publish } from "./resolved.js";
  * matching the design system it was written for.
  */
 const RULE_IDS = [
+  "no-ad-hoc-heading",
+  "no-arbitrary-radius",
+  "no-arbitrary-typography",
   "no-component-color-override",
   "no-dark-variant",
   "no-opacity-modifier",

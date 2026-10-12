@@ -81,6 +81,9 @@ const COLOR_NAMESPACE = "--color";
  *   resolves: (className: string) => boolean,
  *   isColorClass: (className: string) => boolean,
  *   parseRoot: (className: string) => string | null,
+ *   declarations: (className: string) => { property: string, value: string }[] | null,
+ *   arbitraryDeclarations: (className: string) => { property: string, value: string }[] | null,
+ *   themeNameOf: (namespace: string, value: string) => string | null,
  * }} DesignSystemPolicy
  */
 
@@ -188,6 +191,36 @@ export function designSystemPolicy(designSystem, { extraPrefixes = [] } = {}) {
     colorPrefixes,
     colorNames,
     parseRoot,
+
+    /** The declarations a class generates, or `null` where it generates none. */
+    declarations: declarationsOf,
+
+    /**
+     * The declarations of a class whose value is written in brackets — `text-[13px]`, or the
+     * arbitrary property `[font-size:13px]` — and `null` for any other class.
+     *
+     * The caller strips variants, the important modifier and the opacity modifier first.
+     */
+    arbitraryDeclarations(className) {
+      const [candidate] = designSystem.parseCandidate(className) ?? [];
+      if (!candidate) return null;
+      if (candidate.kind !== "arbitrary" && candidate.value?.kind !== "arbitrary") return null;
+      return declarationsOf(className);
+    },
+
+    /**
+     * The theme name whose value is exactly `value` in a namespace — `semibold` for `600`
+     * under `--font-weight` — or `null`. Sub-keys such as `--text-sm--line-height` are not
+     * names a utility takes, and are skipped. No unit is converted: `14px` does not match
+     * `0.875rem`.
+     */
+    themeNameOf(namespace, value) {
+      for (const [name, entry] of designSystem.theme.namespace(namespace)) {
+        if (!name || name.includes("--")) continue;
+        if (entry === value) return name;
+      }
+      return null;
+    },
 
     /**
      * Does this class generate CSS?
