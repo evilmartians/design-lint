@@ -15,10 +15,11 @@ import { publish } from "./resolved.js";
  * a consumer who wipes a rule's options by restating its severity lands on the right
  * behaviour rather than on nothing. This list only says which rules run.
  *
- * **Versioning.** A new rule ships **disabled** and joins this list only in a major
- * release. Adding one here turns a patch upgrade into a failing build for every consumer,
- * which teaches people to pin — and a linter nobody upgrades is a linter that stops
- * matching the design system it was written for.
+ * **Versioning.** A new rule ships **disabled** and joins this list only in a breaking
+ * release — a major, or a minor while the version starts with 0 (see the versioning policy
+ * in CHANGELOG.md). Adding one anywhere else turns a routine upgrade into a failing build
+ * for every consumer, which teaches people to pin — and a linter nobody upgrades is a
+ * linter that stops matching the design system it was written for.
  */
 const RULE_IDS = [
   "no-ad-hoc-heading",

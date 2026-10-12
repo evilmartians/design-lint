@@ -85,7 +85,8 @@ in `docs/rules/` too.
 
 A new rule needs all three: a contract, a guide, and a location fixture in
 `test/harness/locations.test.js` — a test fails without the fixture. New rules ship
-disabled; the full versioning policy is in [`CHANGELOG.md`](./CHANGELOG.md).
+disabled and are turned on only in a breaking release — before 1.0, a minor bump. The
+full versioning policy is in [`CHANGELOG.md`](./CHANGELOG.md).
 
 ## Trying a change in a real project
 

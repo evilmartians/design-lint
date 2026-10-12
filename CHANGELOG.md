@@ -79,10 +79,13 @@ First release. Nine rules, each with a guide in `docs/rules/` and a contract in
 
 ### Versioning policy
 
-- A **new rule ships disabled**, and `designLint()` turns it on only in a major release.
-  Turning one on in a minor makes a routine upgrade a failing build, which teaches
-  people to pin — and a linter nobody upgrades stops matching the design system it was
-  written for.
+- **Before 1.0, the minor number is the major.** A breaking release bumps the minor —
+  0.1 → 0.2 — and npm's `^0.1.5` never installs 0.2.0, so it carries the same guarantee a
+  major does after 1.0. Every "major" below means that bump while the version starts with 0.
+- A **new rule ships disabled**, and `designLint()` turns it on only in a breaking release.
+  Turning one on in any other release makes a routine upgrade a failing build, which
+  teaches people to pin — and a linter nobody upgrades stops matching the design system it
+  was written for.
 - **A rule catching strictly more** than it did — closing a declared blind spot, covering a
   utility family Tailwind added — is a **minor**. It can fail a build that passed, so it is
   never a patch.
