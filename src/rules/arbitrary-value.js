@@ -27,6 +27,10 @@ import { parseClass } from "../policy/variants.js";
  * already names: `font-[600]` → `font-semibold`. No unit is converted and nothing is rounded;
  * anything else is reported with no fix.
  *
+ * A theme name is not yet a class that sets it. With `--text-card` and `--color-card` both
+ * defined, Tailwind reads `text-card` as the colour, so the replacement is generated and
+ * offered only when it sets the same property from that token.
+ *
  * @param {{
  *   name: string,
  *   description: string,
@@ -75,7 +79,7 @@ export function arbitraryValueRule({ name, description, watch, messages }) {
           if (!found) continue;
 
           const at = token.range ? { loc: spanOf(context, token.range) } : { node: source.node };
-          const replacement = found.themeName && found.root ? `${found.root}-${found.themeName}` : null;
+          const { replacement } = found;
 
           context.report({
             ...at,
@@ -109,7 +113,7 @@ const CSS_WIDE_KEYWORDS = new Set(["inherit", "initial", "unset", "revert", "rev
 /**
  * The watched arbitrary value in a class, or `null`.
  *
- * @returns {{ base: string, root: string | null, value: string, messageId: string, themeName: string | null } | null}
+ * @returns {{ base: string, value: string, messageId: string, replacement: string | null } | null}
  */
 function arbitraryValueIn(className, designSystem, watch) {
   const { base } = parseClass(className);
@@ -130,11 +134,27 @@ function arbitraryValueIn(className, designSystem, watch) {
     const root = base.startsWith("[") ? null : designSystem.parseRoot(base);
     return {
       base,
-      root,
       value,
       messageId: watched.messageId,
-      themeName: root ? designSystem.themeNameOf(watched.namespace, value) : null,
+      replacement: root ? replacementFor(designSystem, root, declaration.property, watched.namespace, value) : null,
     };
+  }
+  return null;
+}
+
+/**
+ * The theme class that sets `property` to `value`, or `null`: the first name holding the
+ * value whose class Tailwind turns into that property, read from the token. `@theme inline`
+ * writes the value itself instead of the `var()`, and either is the token.
+ */
+function replacementFor(designSystem, root, property, namespace, value) {
+  for (const name of designSystem.themeNamesOf(namespace, value)) {
+    const candidate = `${root}-${name}`;
+    const declarations = designSystem.declarations(candidate) ?? [];
+    const token = `var(${namespace}-${name})`;
+    if (declarations.some((d) => d.property === property && (d.value === token || d.value === value))) {
+      return candidate;
+    }
   }
   return null;
 }

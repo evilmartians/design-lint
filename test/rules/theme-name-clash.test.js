@@ -7,6 +7,7 @@ import { bindResolved } from "../../src/plugin.js";
 import { designSystemPolicy } from "../../src/policy/design-system.js";
 import { loadDesignSystem } from "../../src/policy/load.js";
 import noComponentColorOverride from "../../src/rules/no-component-color-override.js";
+import noArbitraryTypography from "../../src/rules/no-arbitrary-typography.js";
 import noOpacityModifier from "../../src/rules/no-opacity-modifier.js";
 import noSpectralColor from "../../src/rules/no-spectral-color.js";
 import tokenConstraints from "../../src/rules/token-constraints.js";
@@ -112,5 +113,31 @@ tester.run(
   {
     valid: ['<div className="shadow-card/50" />;'],
     invalid: [{ code: '<div className="bg-card/50" />;', errors: 1 }],
+  },
+);
+
+// `--text-card: 12px` is the value `text-[12px]` names, but `text-card` is a colour here, so
+// offering it would swap a font size for a colour. The report stays; the suggestion goes.
+// A size whose class does generate a font size is still offered.
+tester.run(
+  "no-arbitrary-typography — a font size sharing a colour's name",
+  bindResolved(noArbitraryTypography, { designSystem }),
+  {
+    valid: [],
+    invalid: [
+      {
+        code: '<div className="text-[12px]" />;',
+        errors: [{ messageId: "arbitraryFontSize", suggestions: [] }],
+      },
+      {
+        code: '<div className="text-[0.875rem]" />;',
+        errors: [
+          {
+            messageId: "arbitraryFontSize",
+            suggestions: [{ messageId: "useThemeValue", output: '<div className="text-sm" />;' }],
+          },
+        ],
+      },
+    ],
   },
 );

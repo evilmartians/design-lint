@@ -83,7 +83,7 @@ const COLOR_NAMESPACE = "--color";
  *   parseRoot: (className: string) => string | null,
  *   declarations: (className: string) => { property: string, value: string }[] | null,
  *   arbitraryDeclarations: (className: string) => { property: string, value: string }[] | null,
- *   themeNameOf: (namespace: string, value: string) => string | null,
+ *   themeNamesOf: (namespace: string, value: string) => string[],
  * }} DesignSystemPolicy
  */
 
@@ -209,17 +209,18 @@ export function designSystemPolicy(designSystem, { extraPrefixes = [] } = {}) {
     },
 
     /**
-     * The theme name whose value is exactly `value` in a namespace — `semibold` for `600`
-     * under `--font-weight` — or `null`. Sub-keys such as `--text-sm--line-height` are not
-     * names a utility takes, and are skipped. No unit is converted: `14px` does not match
-     * `0.875rem`.
+     * The theme names whose value is exactly `value` in a namespace — `["semibold"]` for
+     * `600` under `--font-weight` — in theme order. Sub-keys such as `--text-sm--line-height`
+     * are not names a utility takes, and are skipped. No unit is converted: `14px` does not
+     * match `0.875rem`.
      */
-    themeNameOf(namespace, value) {
+    themeNamesOf(namespace, value) {
+      const names = [];
       for (const [name, entry] of designSystem.theme.namespace(namespace)) {
         if (!name || name.includes("--")) continue;
-        if (entry === value) return name;
+        if (entry === value) names.push(name);
       }
-      return null;
+      return names;
     },
 
     /**
