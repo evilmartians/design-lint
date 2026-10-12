@@ -9,11 +9,11 @@ files: ["*.tsx", "*.ts", "*.jsx", "*.js"]
 
 Take font sizes, font weights, and letter spacing from your theme's scale.
 
-A class such as `text-[13px]` picks a size no one else can find. The next screen picks `text-[12.5px]`, and the type scale turns into a list of near-duplicates nobody chose. The same goes for `font-[550]` and `tracking-[0.02em]`. If the scale is missing a step, add it to your token stylesheets once, and every call site can use it.
+An arbitrary value such as `text-[13px]`, `font-[550]`, or `tracking-[0.02em]` defines typography at the call site instead of using a named value from the design system. Similar values can accumulate across screens, making the typography harder to review and update. If no existing value fits, add a token to the design system so every call site can use it.
 
 ## Reports
 
-This rule reports a bracketed value that sets a font size, a font weight, or letter spacing.
+This rule reports arbitrary values that set font size, font weight, or letter spacing.
 
 ```tsx
 <div className="text-[13px]" />
@@ -40,7 +40,7 @@ Values from your theme are allowed.
 <div className="text-sm font-semibold tracking-tight" />
 ```
 
-A bracketed value that reads a CSS variable is a reference to a decision made elsewhere, so it is allowed. CSS-wide keywords such as `inherit` are allowed too.
+Values that reference CSS variables are allowed because they keep the design decision outside the call site. CSS-wide keywords such as `inherit` are allowed too.
 
 ```tsx
 <div className="text-(length:--hero-size)" />
@@ -48,7 +48,7 @@ A bracketed value that reads a CSS variable is a reference to a decision made el
 <div className="tracking-[inherit]" />
 ```
 
-Bracketed values that set something else are not this rule's subject, even under the same prefix: a color, a line height, a font family.
+Arbitrary colors, line heights, and font families are not covered by this rule, even when they use the same utility prefix.
 
 ```tsx
 <div className="text-[#f00]" />            // a color — see no-raw-color
@@ -64,9 +64,9 @@ Bracketed values that set something else are not this rule's subject, even under
 
 ## Fix suggestions
 
-When the bracketed value is exactly a value your theme already names, the rule offers that class as a suggestion: `font-[600]` → `font-semibold`, `tracking-[0.025em]` → `tracking-wide`. The match is literal. `text-[14px]` is not matched to a size defined as `0.875rem`, and no value is rounded to the nearest step.
+When an arbitrary utility value exactly matches a named value in your theme, the rule suggests the corresponding class: `font-[600]` → `font-semibold`, `tracking-[0.025em]` → `tracking-wide`. The match is literal. `text-[14px]` is not matched to a size defined as `0.875rem`, and no value is rounded to the nearest step.
 
-A font size suggestion replaces a class that set only the size with a theme class that also sets the theme's line height for that size.
+A suggested font size class also applies the line height defined for that size in your theme. Check the line height when replacing an arbitrary font size.
 
 ## Options
 
@@ -77,5 +77,5 @@ A font size suggestion replaces a class that set only the size with a theme clas
 ## Common fixes
 
 - Replace the value with the nearest step of your scale, and check the result with a designer if the difference is visible.
-- If the design really needs a new step, add a `--text-*`, `--font-weight-*`, or `--tracking-*` token to your token stylesheets and use its class.
+- If the design needs a new step, add a `--text-*`, `--font-weight-*`, or `--tracking-*` token to your token stylesheets and use its class.
 - If the value is computed at runtime, pass it through a CSS variable: `text-(length:--hero-size)`.

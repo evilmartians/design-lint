@@ -2,7 +2,7 @@
 
 Design-token lint rules for Tailwind v4 projects using [Oxlint](https://oxc.rs/docs/guide/usage/linter).
 
-The rules keep color, type, and radius decisions inside your design system. They catch hard-coded colors, Tailwind palette colors, local dark-mode branches, invalid token names, component color overrides, bracketed font sizes, weights, letter spacing, and radii, and headings styled by hand.
+The rules keep color, typography, and corner radii inside your design system. They catch hard-coded colors, Tailwind palette colors, local dark-mode branches, invalid token names, and component color overrides. They also catch arbitrary typography and radii, headings styled without heading classes, and overrides to heading typography.
 
 ```sh
 npm install --save-dev @evilmartians/design-lint oxlint
@@ -74,9 +74,9 @@ src/App.tsx:8:21: error design(no-undefined-token): text-nonesuch generates no C
 | [`no-dark-variant`](./docs/rules/no-dark-variant.md) | Local theme branches written with `dark:` or `light-dark()` |
 | [`no-useless-hover`](./docs/rules/no-useless-hover.md) | Hover styles on elements that are not interactive |
 | [`no-component-color-override`](./docs/rules/no-component-color-override.md) | Color classes passed to design-system components through `className` |
-| [`no-arbitrary-typography`](./docs/rules/no-arbitrary-typography.md) | Bracketed font sizes, weights, and letter spacing such as `text-[13px]` |
-| [`no-arbitrary-radius`](./docs/rules/no-arbitrary-radius.md) | Bracketed radii such as `rounded-[6px]` |
-| [`no-ad-hoc-heading`](./docs/rules/no-ad-hoc-heading.md) | Headings styled by hand instead of with a heading class, and heading classes with their typography changed |
+| [`no-arbitrary-typography`](./docs/rules/no-arbitrary-typography.md) | Arbitrary font sizes, font weights, and letter spacing such as `text-[13px]` |
+| [`no-arbitrary-radius`](./docs/rules/no-arbitrary-radius.md) | Arbitrary corner radii such as `rounded-[6px]` |
+| [`no-ad-hoc-heading`](./docs/rules/no-ad-hoc-heading.md) | Headings styled without heading classes, and overrides to heading typography |
 
 Each rule has a short guide in [`docs/rules`](./docs/rules/): what it reports, what it allows, and how to fix it.
 

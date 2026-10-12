@@ -31,15 +31,14 @@ rule rather than forking one.
 
 ### No heuristics decide whether a rule reports
 
-A rule does not guess whether a project wants its reports. It never turns itself off, or
-stays quiet, because the project *looks* like one the rule does not fit — a theme that
-seems to lack the classes the rule asks for, say — and it never auto-detects what a
-project's vocabulary is. What a rule looks for is an option with a default. A project
-that does not want the reports disables the rule; a project shaped differently sets the
-option.
+A rule reports according to its configured options. It does not disable itself because a
+project appears to lack the classes it expects, or infer the project's vocabulary from
+its theme. The vocabulary is a rule option with a default. A project that needs different
+class names configures the option; a project that does not want the reports disables the
+rule.
 
-The same goes for rules among themselves: each one behaves the same alone as alongside
-the others, and none stays quiet about a case because another rule also reports it.
+Rules also report independently. Each behaves the same whether it runs alone or alongside
+other rules, even when more than one rule reports the same class.
 
 ### Only the factory reads files
 

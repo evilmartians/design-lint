@@ -2,22 +2,22 @@
 
 ## 0.2.0
 
-Three new rules, **turned on** by `designLint()`. Upgrading can fail a build that passed
-on 0.1.x. To adopt them gradually, restate any of them as `"off"` or `"warn"` in your
-config, or record the existing violations with `oxlint --suppress-all`.
+Three new rules are enabled by `designLint()`. Upgrading can fail a build that passed
+on 0.1.x. To adopt them gradually, set individual rules to `"off"` or `"warn"` in your
+config, or record existing violations with `oxlint --suppress-all`.
 
-- `no-arbitrary-typography` reports a font size, font weight or letter spacing written in
-  brackets — `text-[13px]`, `font-[500]`, `tracking-[0.02em]`, `[font-size:13px]` — where the
-  theme has a scale. A value that reads a CSS variable is allowed. When the value is exactly
-  one the theme names, the class is offered as a suggestion: `font-[600]` → `font-semibold`.
-- `no-arbitrary-radius` does the same for corner radii: `rounded-[6px]`, `rounded-tl-[4px]`,
-  `[border-radius:6px]`. `rounded-[calc(var(--radius)-2px)]` and `rounded-[inherit]` are
-  allowed.
-- `no-ad-hoc-heading` reports an `<h1>`–`<h6>` that sets a font size or a font weight with a
-  class of its own instead of a heading class — `<h2 className="text-xl">` — and any element
-  that changes a heading class's typography: `<div className="heading-1 font-bold">`,
-  `heading-2 md:text-3xl`. Heading classes are the `headingClasses` globs, `["heading-*"]` by
-  default.
+- `no-arbitrary-typography` reports arbitrary font sizes, font weights, and letter spacing,
+  such as `text-[13px]`, `font-[500]`, `tracking-[0.02em]`, and `[font-size:13px]`.
+  CSS variable references are allowed. When an arbitrary utility value exactly matches a
+  named theme value, the rule suggests its class: `font-[600]` → `font-semibold`.
+- `no-arbitrary-radius` reports arbitrary corner radii, such as `rounded-[6px]`,
+  `rounded-tl-[4px]`, and `[border-radius:6px]`. CSS variable references and CSS-wide
+  keywords are allowed, including `rounded-[calc(var(--radius)-2px)]` and `rounded-[inherit]`.
+- `no-ad-hoc-heading` reports `<h1>`–`<h6>` elements with font size or font weight classes
+  but no heading class, such as `<h2 className="text-xl">`. It also reports typography
+  overrides on any element with a heading class, such as `heading-1 font-bold` or
+  `heading-2 md:text-3xl`. The `headingClasses` option defines the heading class patterns
+  and defaults to `["heading-*"]`.
 
 ## 0.1.5
 
