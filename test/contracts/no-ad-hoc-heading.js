@@ -172,5 +172,14 @@ export default {
       code: `<CardTitle className="heading-4 font-bold" />`,
       reports: [{ id: "headingClassOverride", line: 1, column: 33, endLine: 1, endColumn: 42 }],
     },
+    // Every branch of a `className` is read as one class list, so a heading class and a
+    // typography class in opposite branches — which never reach the element together — still
+    // report. The accepted false positive, answered by `oxlint-disable-next-line`.
+    {
+      kind: "caught",
+      group: "Headings the rule cannot see",
+      code: `<div className={cn(big ? "heading-1" : "text-sm")} />`,
+      reports: [{ id: "headingClassOverride", line: 1, column: 41, endLine: 1, endColumn: 48 }],
+    },
   ],
 };

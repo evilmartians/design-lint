@@ -62,6 +62,7 @@ Typography classes on other elements are allowed when no heading class is presen
 - Heading components such as `<Heading>`, whose underlying element is defined in another file. A heading class passed to a component is still checked for overrides.
 - `role="heading"` on another element.
 - Class lists passed in a variable: `<h1 className={titleStyles} />`.
+- Which classes can apply together. All branches of a conditional count as one class list, so `cn(big ? "heading-1" : "text-sm")` is reported as an override even though the two classes never apply at once. Use `oxlint-disable-next-line` for such cases.
 
 ## Options
 
