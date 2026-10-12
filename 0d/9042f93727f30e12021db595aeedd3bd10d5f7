@@ -1,0 +1,21 @@
+test/contracts/no-ad-hoc-heading.js
+  s_e7729ab4d4ac37::t_549145536de5e8 175-183
+docs/rules/no-ad-hoc-heading.md
+  s_e7729ab4d4ac37::t_798a4158dfe6eb 65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0d9042f93727f30e12021db595aeedd3bd10d5f7",
+  "prompts": {},
+  "sessions": {
+    "s_e7729ab4d4ac37": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81a88f40-5b1b-4e57-a072-1eefdc910c44",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
