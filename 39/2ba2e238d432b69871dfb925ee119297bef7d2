@@ -1,0 +1,32 @@
+docs/rules/no-arbitrary-radius.md
+  s_ede27616032b65::t_793d6555a92ddb 12,16,37,53
+docs/rules/README.md
+  s_ede27616032b65::t_dd0f2dded27765 30
+  s_ede27616032b65::t_793d6555a92ddb 3,16-18
+README.md
+  s_ede27616032b65::t_793d6555a92ddb 5,77-79
+docs/rules/no-ad-hoc-heading.md
+  s_ede27616032b65::t_793d6555a92ddb 10,12,16,25,40,48,54,62,70,77,81-82
+docs/rules/no-arbitrary-typography.md
+  s_ede27616032b65::t_793d6555a92ddb 12,16,43,51,67,69,80
+CONTRIBUTING.md
+  s_ede27616032b65::t_793d6555a92ddb 34-41
+CHANGELOG.md
+  s_ede27616032b65::t_793d6555a92ddb 5-7,9-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "392ba2e238d432b69871dfb925ee119297bef7d2",
+  "prompts": {},
+  "sessions": {
+    "s_ede27616032b65": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a12f5e-a0b5-7a92-b87b-073e575ff95e",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
