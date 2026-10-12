@@ -1,0 +1,24 @@
+CONTRIBUTING.md
+  s_098f4ed6e66ee3::t_69d44e4cfd83c3 88-89
+src/preset/index.js
+  s_098f4ed6e66ee3::t_69d44e4cfd83c3 18-19
+  s_098f4ed6e66ee3::t_3b55a1909468ee 20-22
+CHANGELOG.md
+  s_098f4ed6e66ee3::t_69d44e4cfd83c3 82-88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "91d59a64336a9a83dbcbcd2b2faa41a611523d98",
+  "prompts": {},
+  "sessions": {
+    "s_098f4ed6e66ee3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4f61693c-fc1a-4727-8f33-cdd87c7e9be8",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
