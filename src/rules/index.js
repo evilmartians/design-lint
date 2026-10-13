@@ -1,4 +1,3 @@
-import noAdHocHeading from "./no-ad-hoc-heading.js";
 import noArbitraryRadius from "./no-arbitrary-radius.js";
 import noArbitraryTypography from "./no-arbitrary-typography.js";
 import noComponentColorOverride from "./no-component-color-override.js";
@@ -17,7 +16,6 @@ import tokenConstraints from "./token-constraints.js";
  * `test/contracts/`, and the contract tests fail if the two sets ever diverge.
  */
 export const rules = {
-  "no-ad-hoc-heading": noAdHocHeading,
   "no-arbitrary-radius": noArbitraryRadius,
   "no-arbitrary-typography": noArbitraryTypography,
   "no-component-color-override": noComponentColorOverride,

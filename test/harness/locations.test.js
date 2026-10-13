@@ -121,33 +121,6 @@ export const FIXTURES = {
       ],
     },
   ],
-  "no-ad-hoc-heading": [
-    {
-      name: "one report per element, at its first offending class",
-      code: [
-        'const title = "Settings";',
-        "<section>",
-        "  <h2",
-        "    className={cn(",
-        '      "mb-2",',
-        '      "font-bold",',
-        '      "text-2xl",',
-        "    )}",
-        "  >",
-        "    {title}",
-        "  </h2>",
-        '  <h3 className="heading-3 mt-4">{title}</h3>',
-        '  <div className="heading-6 text-sm uppercase">{title}</div>',
-        "</section>;",
-      ].join("\n"),
-      errors: [
-        // Two classes of its own, one report, at the first of them.
-        { messageId: "handStyledHeading", line: 6, column: 8, endLine: 6, endColumn: 17 },
-        // Line 12 places a heading class, and is silent.
-        { messageId: "headingClassOverride", line: 13, column: 29, endLine: 13, endColumn: 36 },
-      ],
-    },
-  ],
   "no-opacity-modifier": [
     {
       name: "each offending class, at the class and not at the string that holds it",

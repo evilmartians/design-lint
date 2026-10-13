@@ -2,9 +2,16 @@
 
 ## 0.2.0
 
-Three new rules are enabled by `designLint()`. Upgrading can fail a build that passed
-on 0.1.x. To adopt them gradually, set individual rules to `"off"` or `"warn"` in your
-config, or record existing violations with `oxlint --suppress-all`.
+`designLint()` now supports two presets. The default enables two new rules, so
+upgrading from 0.1.x may fail a previously passing build. To adopt them gradually,
+set individual rules to `"off"` or `"warn"`, or record existing violations with
+`oxlint --suppress-all`.
+
+- **`strict`** (default) enables all rules. Existing configs need no changes and
+  gain the two rules below. `componentSources` remains required.
+- **`basic`** enables seven rules that require only token stylesheets. It excludes
+  checks for token roles, local themes, opacity modifiers, and component color
+  overrides. It rejects `componentSources`. See the [rule list](./README.md#rules).
 
 - `no-arbitrary-typography` reports arbitrary font sizes, font weights, and letter spacing,
   such as `text-[13px]`, `font-[500]`, `tracking-[0.02em]`, and `[font-size:13px]`.
@@ -13,11 +20,6 @@ config, or record existing violations with `oxlint --suppress-all`.
 - `no-arbitrary-radius` reports arbitrary corner radii, such as `rounded-[6px]`,
   `rounded-tl-[4px]`, and `[border-radius:6px]`. CSS variable references and CSS-wide
   keywords are allowed, including `rounded-[calc(var(--radius)-2px)]` and `rounded-[inherit]`.
-- `no-ad-hoc-heading` reports `<h1>`–`<h6>` elements with font size or font weight classes
-  but no heading class, such as `<h2 className="text-xl">`. It also reports typography
-  overrides on any element with a heading class, such as `heading-1 font-bold` or
-  `heading-2 md:text-3xl`. The `headingClasses` option defines the heading class patterns
-  and defaults to `["heading-*"]`.
 
 ## 0.1.5
 
@@ -82,10 +84,9 @@ First release. Nine rules, each with a guide in `docs/rules/` and a contract in
 - **Before 1.0, the minor number is the major.** A breaking release bumps the minor —
   0.1 → 0.2 — and npm's `^0.1.5` never installs 0.2.0, so it carries the same guarantee a
   major does after 1.0. Every "major" below means that bump while the version starts with 0.
-- A **new rule ships disabled**, and `designLint()` turns it on only in a breaking release.
-  Turning one on in any other release makes a routine upgrade a failing build, which
-  teaches people to pin — and a linter nobody upgrades stops matching the design system it
-  was written for.
+- **Enabling a rule in a preset requires a breaking release.** New rules ship disabled;
+  adding one to a preset or moving one from `strict` to `basic` can fail a previously
+  passing build.
 - **A rule catching strictly more** than it did — closing a declared blind spot, covering a
   utility family Tailwind added — is a **minor**. It can fail a build that passed, so it is
   never a patch.

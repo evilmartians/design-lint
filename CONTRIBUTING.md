@@ -85,8 +85,11 @@ in `docs/rules/` too.
 
 A new rule needs all three: a contract, a guide, and a location fixture in
 `test/harness/locations.test.js` — a test fails without the fixture. New rules ship
-disabled and are turned on only in a breaking release — before 1.0, a minor bump. The
-full versioning policy is in [`CHANGELOG.md`](./CHANGELOG.md).
+disabled and join a preset only in a breaking release — before 1.0, a minor bump.
+Use `basic` for rules that require only token stylesheets. Use `strict` for rules that
+rely on project conventions, such as token naming, component variants, or heading
+classes. The strict preset also includes all basic rules. See the
+[versioning policy](./CHANGELOG.md#versioning-policy).
 
 ## Trying a change in a real project
 

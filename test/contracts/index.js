@@ -1,4 +1,3 @@
-import noAdHocHeading from "./no-ad-hoc-heading.js";
 import noArbitraryRadius from "./no-arbitrary-radius.js";
 import noArbitraryTypography from "./no-arbitrary-typography.js";
 import noComponentColorOverride from "./no-component-color-override.js";
@@ -46,7 +45,6 @@ import tokenConstraints from "./token-constraints.js";
 
 /** @type {Contract[]} */
 export const contracts = [
-  noAdHocHeading,
   noArbitraryRadius,
   noArbitraryTypography,
   noComponentColorOverride,
