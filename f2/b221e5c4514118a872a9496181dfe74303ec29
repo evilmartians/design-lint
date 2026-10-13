@@ -1,0 +1,25 @@
+CHANGELOG.md
+  s_5bc2e429fe9fc1::t_8093c3e0a74b3c 5
+README.md
+  s_5bc2e429fe9fc1::t_6c5231b56e62d8 5
+test/extract/corpus.test.js
+  s_5bc2e429fe9fc1::t_4af1de50a28231 34
+test/report/report.test.js
+  s_5bc2e429fe9fc1::t_b11ad0146783b3 161,217,237
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f2b221e5c4514118a872a9496181dfe74303ec29",
+  "prompts": {},
+  "sessions": {
+    "s_5bc2e429fe9fc1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "36e4f985-b802-47d4-9ffd-1bc0fc775132",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
