@@ -78,7 +78,7 @@ describe("designLint", () => {
     writeFileSync(join(root, "src", "styles.css"), '@import "tailwindcss";\n@import "./tokens.css";\n');
     writeFileSync(join(root, "src", "tokens.css"), "@theme { --color-brand: oklch(0.6 0.2 25); }\n");
 
-    await designLint({ tokenFiles: ["src/styles.css"], componentSources: [], base: root });
+    await designLint({ preset: "basic", tokenFiles: ["src/styles.css"], base: root });
     expect(consume().designSystem.resolves("bg-brand")).toBe(true);
     // And it is the project's own: a scan of the token file's text would miss a token
     // defined in a file it imports, and report it as palette.
@@ -94,7 +94,7 @@ describe("designLint", () => {
     writeFileSync(join(root, "styles.css"), '@import "tailwindcss";\n@theme { --color-*: initial; }\n');
 
     await expect(
-      designLint({ tokenFiles: ["styles.css"], componentSources: [], base: root }),
+      designLint({ preset: "basic", tokenFiles: ["styles.css"], base: root }),
     ).rejects.toThrow(/define no --color-\* tokens/);
   });
 });

@@ -7,33 +7,38 @@ import { projectTokens } from "../policy/tokens.js";
 import { publish } from "./resolved.js";
 
 /**
- * The rules the factory turns on: every rule, at the consumer's `severity`.
+ * Each preset selects rules to enable at the consumer's `severity`. Rule defaults live
+ * in `meta.defaultOptions`, or in `create` for token-constraints, so changing severity
+ * without options still uses the recommended policy.
  *
- * These are severities, not semantics. What each rule *means* lives in its contract and in
- * the rule itself, which carries the recommended policy — in `meta.defaultOptions`, or for
- * `token-constraints` in `create`, when neither `allowed` nor `denied` is written — so that
- * a consumer who wipes a rule's options by restating its severity lands on the right
- * behaviour rather than on nothing. This list only says which rules run.
+ * `basic` requires only token stylesheets. `strict` includes basic rules and checks for
+ * token roles, themes, translucent tokens, and component variants.
+ * Choose a rule's preset by its requirements. `strict` is the default.
  *
- * **Versioning.** A new rule ships **disabled** and joins this list only in a breaking
- * release — a major, or a minor while the version starts with 0 (see the versioning policy
- * in CHANGELOG.md). Adding one anywhere else turns a routine upgrade into a failing build
- * for every consumer, which teaches people to pin — and a linter nobody upgrades is a
- * linter that stops matching the design system it was written for.
+ * New rules ship disabled. Adding a rule to a preset or moving one from `strict` to
+ * `basic` requires a breaking release: a major, or a minor before 1.0.
+ * See the versioning policy in CHANGELOG.md.
  */
-const RULE_IDS = [
+const BASIC = [
   "no-arbitrary-radius",
   "no-arbitrary-typography",
-  "no-component-color-override",
-  "no-dark-variant",
-  "no-opacity-modifier",
   "no-raw-color",
   "no-spectral-color",
   "no-style-color",
   "no-undefined-token",
   "no-useless-hover",
-  "token-constraints",
 ];
+
+const PRESETS = {
+  basic: BASIC,
+  strict: [
+    ...BASIC,
+    "no-component-color-override",
+    "no-dark-variant",
+    "no-opacity-modifier",
+    "token-constraints",
+  ],
+};
 
 /**
  * The factory a consumer imports.
@@ -65,26 +70,35 @@ const RULE_IDS = [
  * and the one filesystem read this package performs happens here, once per lint run.
  */
 export async function designLint({
+  preset = "strict",
   tokenFiles,
   componentSources,
   namespace = "design",
   severity = "error",
   base = process.cwd(),
 } = {}) {
+  if (!Object.hasOwn(PRESETS, preset)) {
+    throw new Error(
+      `design-lint: unknown \`preset\` ${JSON.stringify(preset)}. Use "basic" for checks that require only token stylesheets, or "strict" (default) for all rules.`,
+    );
+  }
+
   if (!Array.isArray(tokenFiles) || tokenFiles.length === 0) {
     throw new Error(
       'design-lint: `tokenFiles` is required — the stylesheets your `--color-*` tokens are defined in, e.g. ["src/styles.css"]. Without them no rule can tell a token from a typo, and a rule that cannot tell reports nothing.',
     );
   }
 
-  // `no-component-color-override` watches components by where they were imported from, so
-  // it cannot run without being told where those live. Presence of the key is the decision:
-  // a list turns the rule on, `[]` says this project has no design-system component library
-  // and turns it off, and leaving it out at all is not a decision — it throws rather than
-  // enabling a rule that fails on the first file, or quietly dropping one that was asked for.
-  if (componentSources === undefined) {
+  // Strict requires component import globs; [] explicitly disables the component check.
+  // Basic rejects this option because it does not enable the component rule.
+  if (preset === "basic" && componentSources !== undefined) {
     throw new Error(
-      'design-lint: `componentSources` is required — the import globs your design-system components come from, matched against each import exactly as written — if your code imports "#/components/ui/button", pass ["#/components/ui/*"], even when another alias points at the same folder (a shadcn project records it as `aliases.ui` in components.json). It is how no-component-color-override knows which elements own their own colour. Pass `[]` if this project has no such library.',
+      'design-lint: The "basic" preset does not turn on no-component-color-override. Remove `componentSources`, or use preset: "strict" to check component colors.',
+    );
+  }
+  if (preset === "strict" && componentSources === undefined) {
+    throw new Error(
+      'design-lint: `componentSources` is required by the "strict" preset (default). Provide import globs for your design-system components, matching imports exactly: for "#/components/ui/button", use ["#/components/ui/*"]. Pass [] if you have no component library, or use preset: "basic".',
     );
   }
 
@@ -120,8 +134,8 @@ export async function designLint({
 
   publish({ designSystem, tokens });
 
-  const watching = componentSources.length > 0;
-  const ids = RULE_IDS.filter((id) => id !== "no-component-color-override" || watching);
+  const watching = preset === "strict" && componentSources.length > 0;
+  const ids = PRESETS[preset].filter((id) => id !== "no-component-color-override" || watching);
 
   return {
     jsPlugins: ["@evilmartians/design-lint/oxlint"],

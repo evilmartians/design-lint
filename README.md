@@ -30,6 +30,24 @@ export default defineConfig(
 
 If the project has no component library, pass `componentSources: []`. That turns off `no-component-color-override`.
 
+### Presets
+
+Choose a preset with the `preset` option:
+
+- **`"strict"`** (default) enables all rules, including checks for token naming, themes, and component variants. It requires `componentSources`; pass `[]` if you have no component library.
+- **`"basic"`** enables checks that require only token stylesheets. Omit `componentSources`; this preset rejects it.
+
+See [Rules](#rules) for the rules in each preset and their requirements.
+
+```ts
+await designLint({
+  preset: "basic",
+  tokenFiles: ["src/styles.css"],
+});
+```
+
+You can enable individual strict rules with `basic`; see [Configuration](#configuration).
+
 ### Keeping an existing `.oxlintrc.json`
 
 Oxlint refuses to start when `oxlint.config.ts` and `.oxlintrc.json` sit in the same directory, and the setup above needs the TypeScript config. To keep your JSON config as it is, rename it (to `oxlint.base.json`, say) and merge it in:
@@ -63,33 +81,47 @@ src/App.tsx:8:21: error design(no-undefined-token): text-nonesuch generates no C
 
 ## Rules
 
+### Basic
+
+Enabled in both presets. These rules require only token stylesheets.
+
 | Rule | What it reports |
 | --- | --- |
 | [`no-raw-color`](./docs/rules/no-raw-color.md) | Literal colors such as `#f00`, `rgb(...)`, `red`, and `bg-[#f00]` |
 | [`no-spectral-color`](./docs/rules/no-spectral-color.md) | Tailwind palette classes such as `bg-red-500` |
 | [`no-undefined-token`](./docs/rules/no-undefined-token.md) | Token-like color classes that generate no CSS |
-| [`token-constraints`](./docs/rules/token-constraints.md) | Valid tokens used in the wrong role, such as `bg-muted-foreground` |
 | [`no-style-color`](./docs/rules/no-style-color.md) | Color applied through React's `style` prop |
-| [`no-opacity-modifier`](./docs/rules/no-opacity-modifier.md) | Color classes with opacity modifiers such as `bg-primary/50` |
-| [`no-dark-variant`](./docs/rules/no-dark-variant.md) | Local theme branches written with `dark:` or `light-dark()` |
 | [`no-useless-hover`](./docs/rules/no-useless-hover.md) | Hover styles on elements that are not interactive |
-| [`no-component-color-override`](./docs/rules/no-component-color-override.md) | Color classes passed to design-system components through `className` |
 | [`no-arbitrary-typography`](./docs/rules/no-arbitrary-typography.md) | Arbitrary font sizes, font weights, and letter spacing such as `text-[13px]` |
 | [`no-arbitrary-radius`](./docs/rules/no-arbitrary-radius.md) | Arbitrary corner radii such as `rounded-[6px]` |
+
+### Strict
+
+Enabled only in `strict`, alongside all basic rules. These checks rely on the conventions below.
+
+| Rule | What it reports | Required convention |
+| --- | --- | --- |
+| [`token-constraints`](./docs/rules/token-constraints.md) | Valid tokens used in the wrong role, such as `bg-muted-foreground` | Tokens named by role: `*-foreground` for text, `*-hover` for hover states |
+| [`no-dark-variant`](./docs/rules/no-dark-variant.md) | Local theme branches written with `dark:` or `light-dark()` | Themes defined in token stylesheets |
+| [`no-opacity-modifier`](./docs/rules/no-opacity-modifier.md) | Color classes with opacity modifiers such as `bg-primary/50` | Named tokens for translucent colors |
+| [`no-component-color-override`](./docs/rules/no-component-color-override.md) | Color classes passed to design-system components through `className` | Component variants that control appearance |
 
 Each rule has a short guide in [`docs/rules`](./docs/rules/): what it reports, what it allows, and how to fix it.
 
 ## Configuration
 
-The preset gives every rule a recommended default. You can override individual rules in the usual Oxlint way:
+Override rule options or enable additional rules in your Oxlint config. Keep `...design.rules` to preserve the preset’s rules:
 
 ```ts
+const design = await designLint({
+  preset: "basic",
+  tokenFiles: ["src/styles.css"],
+});
+
 export default defineConfig({
-  ...(await designLint({
-    tokenFiles: ["src/styles.css"],
-    componentSources: ["@/components/ui/*"],
-  })),
+  ...design,
   rules: {
+    ...design.rules,
     "design/no-dark-variant": ["error", { flagNonColorUtilities: false }],
   },
 });
@@ -122,7 +154,7 @@ Ignored paths (2)
   src/brand/art.tsx  no-raw-color
 ```
 
-- **Disabled rules** are rules turned `off` in your config, or never turned on. For example, `componentSources: []` leaves out `no-component-color-override`.
+- **Disabled rules** are rules set to `off` or omitted from your config. This includes strict rules when using `basic`, and `no-component-color-override` when `componentSources: []`.
 - **Silenced** adds line-disable rule mentions to recorded bulk suppression counts, broken down by rule, in files Oxlint lints. Each `oxlint-disable-line`, `oxlint-disable-next-line`, or equivalent `eslint-` comment contributes one per named design rule. A comment naming no rules contributes one on its own line. Bulk counts come from `oxlint-suppressions.json`, read from the directory Oxlint runs in. The total is an indicator of suppression use: a line comment can hide several violations or none, and recorded bulk counts can become stale.
 - **Ignored paths** lists the config's `ignorePatterns` and files containing a block `/* oxlint-disable */` or `/* eslint-disable */` comment. Comment entries show the design rules named, or "all rules" when none are named. A block disable can cover only part of a file, for example when followed by an enable comment; its entry does not mean the entire file is unchecked.
 
