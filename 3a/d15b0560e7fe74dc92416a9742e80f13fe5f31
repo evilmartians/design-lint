@@ -1,0 +1,47 @@
+CHANGELOG.md
+  s_5bc2e429fe9fc1::t_f98bcb0a13ebe7 5,16-20
+README.md
+  s_5bc2e429fe9fc1::t_38f0783af768d7 5,79
+docs/rules/README.md
+  s_5bc2e429fe9fc1::t_bdfd79486ed934 18
+src/preset/index.js
+  s_5bc2e429fe9fc1::t_843823e14044c3 25
+src/rules/index.js
+  s_5bc2e429fe9fc1::t_809ea9764def1c 1,20
+src/rules/inputs.js
+  s_5bc2e429fe9fc1::t_acb86111344fcb 14
+test/contracts/index.js
+  s_5bc2e429fe9fc1::t_f5ce6df57ca726 1,49
+test/extract/corpus.test.js
+  s_5bc2e429fe9fc1::t_ebe680046bea1b 34
+test/harness/locations.test.js
+  s_5bc2e429fe9fc1::t_921332b401b29d 124-150
+test/harness/options.js
+  s_5bc2e429fe9fc1::t_4f9ae04ccc6b9a 202
+test/report/report.test.js
+  s_5bc2e429fe9fc1::t_f17497eae0c3a2 161,217,237
+docs/rules/no-ad-hoc-heading.md
+  s_5bc2e429fe9fc1::t_9f13d71bf7797c 1-84
+src/rules/no-ad-hoc-heading.js
+  s_5bc2e429fe9fc1::t_4f2b7fb3942189 1-185
+test/contracts/no-ad-hoc-heading.js
+  s_5bc2e429fe9fc1::t_fb5db404a0de8c 1-185
+test/rules/no-ad-hoc-heading.test.js
+  s_5bc2e429fe9fc1::t_74337c5739051f 1-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3ad15b0560e7fe74dc92416a9742e80f13fe5f31",
+  "prompts": {},
+  "sessions": {
+    "s_5bc2e429fe9fc1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "36e4f985-b802-47d4-9ffd-1bc0fc775132",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
