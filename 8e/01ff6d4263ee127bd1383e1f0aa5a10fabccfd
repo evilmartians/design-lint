@@ -1,0 +1,74 @@
+README.md
+  s_5bc2e429fe9fc1::t_9c280465fc99e5 37
+  s_cb7a74a3755876::t_b01ee9925cdd92 33,44
+  s_cb7a74a3755876::t_f99a556ac40d9a 34,36,39,42-43,45-47,50,84-85,87,99,101,103-104,106,116-120,122,124
+  s_5bc2e429fe9fc1::t_18a3354bfc4fac 108
+  s_cb7a74a3755876::t_d2692a66fd9040 98
+  s_1b97024b49f04c::t_11d0fcd498f966 35,38,40-41,49,86,100,102,105,107,113,157
+  s_5bc2e429fe9fc1::t_455a499a8a9767 48
+CONTRIBUTING.md
+  s_1b97024b49f04c::t_11d0fcd498f966 88-92
+test/policy/load.test.js
+  s_cb7a74a3755876::t_42c63952c96503 81,97
+CHANGELOG.md
+  s_cb7a74a3755876::t_45438c4aa15528 8
+  s_cb7a74a3755876::t_d9b04c4af4bd6e 9
+  s_5bc2e429fe9fc1::t_9c280465fc99e5 5,11,13-14
+  s_1b97024b49f04c::t_11d0fcd498f966 6-7,10,12,87-89
+test/preset/presets.test.js
+  s_cb7a74a3755876::t_d2692a66fd9040 27,41-43,48,51-52,73-75
+  s_cb7a74a3755876::t_84d247516de49f 56-64
+  s_cb7a74a3755876::t_caaff9cee979fa 5
+  s_cb7a74a3755876::t_91284c9c793c8f 1-4,7-26,28-40,44-47,49-50,53-55,65-72,76-78
+  s_cb7a74a3755876::t_7a3f5f4e37285d 6
+src/preset/index.js
+  s_5bc2e429fe9fc1::t_9c280465fc99e5 15
+  s_5bc2e429fe9fc1::t_c5ce35d443bbd8 42
+  s_cb7a74a3755876::t_864750a41e3e8f 22,32-33,35-41,80-81,83-85,94-95,97-98,138
+  s_1b97024b49f04c::t_9795225654eff7 10-12,14,16,18-20,82,92-93,96,101
+  s_cb7a74a3755876::t_d2692a66fd9040 34,99,137
+  s_cb7a74a3755876::t_84d247516de49f 73
+docs/rules/README.md
+  s_5bc2e429fe9fc1::t_9c280465fc99e5 5,31
+  s_cb7a74a3755876::t_743bd374f3bc9d 6-12,16,18-19
+  s_cb7a74a3755876::t_d2692a66fd9040 13-15,17
+src/preset/index.d.ts
+  s_5bc2e429fe9fc1::t_3cb05c37502858 35
+  s_5bc2e429fe9fc1::t_9c280465fc99e5 23
+  s_cb7a74a3755876::t_d2692a66fd9040 20,34
+  s_cb7a74a3755876::t_42c63952c96503 3,14,16-19,21,24,26-33
+  s_cb7a74a3755876::t_84d247516de49f 25
+  s_1b97024b49f04c::t_11d0fcd498f966 15,22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8e01ff6d4263ee127bd1383e1f0aa5a10fabccfd",
+  "prompts": {},
+  "sessions": {
+    "s_1b97024b49f04c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1340e-92d9-7062-a868-681913548d7d",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    },
+    "s_5bc2e429fe9fc1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "36e4f985-b802-47d4-9ffd-1bc0fc775132",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    },
+    "s_cb7a74a3755876": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cfb74c35-6eff-4871-a9d8-4a68f86b20e2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
