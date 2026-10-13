@@ -1,0 +1,69 @@
+docs/rules/README.md
+  s_cb7a74a3755876::t_743bd374f3bc9d 6-12,16,18-19
+  s_1b97024b49f04c::t_11d0fcd498f966 5
+  s_cb7a74a3755876::t_d2692a66fd9040 13-15,17,20
+README.md
+  s_cb7a74a3755876::t_b01ee9925cdd92 33,44
+  s_cb7a74a3755876::t_f99a556ac40d9a 34,36,39,42-43,45-47,50,84-85,87,97,99,101,103-104,106,108,117-121,123,125
+  s_cb7a74a3755876::t_d2692a66fd9040 98
+  s_1b97024b49f04c::t_11d0fcd498f966 35,37-38,40-41,49,86,100,102,105,107,114,158
+  s_5bc2e429fe9fc1::t_455a499a8a9767 48
+src/preset/index.js
+  s_cb7a74a3755876::t_864750a41e3e8f 22,32-33,35-42,81-82,84-86,95-96,98-99,139
+  s_1b97024b49f04c::t_9795225654eff7 10-12,14-16,18-20,83,93-94,97,102
+  s_cb7a74a3755876::t_d2692a66fd9040 34,100,138
+  s_cb7a74a3755876::t_84d247516de49f 74
+  s_5bc2e429fe9fc1::t_c5ce35d443bbd8 43
+test/preset/presets.test.js
+  s_cb7a74a3755876::t_7a3f5f4e37285d 6
+  s_cb7a74a3755876::t_d2692a66fd9040 27,42-44,49,52-53,74-76
+  s_cb7a74a3755876::t_84d247516de49f 57-65
+  s_cb7a74a3755876::t_caaff9cee979fa 5
+  s_cb7a74a3755876::t_91284c9c793c8f 1-4,7-26,28-41,45-48,50-51,54-56,66-73,77-79
+CHANGELOG.md
+  s_cb7a74a3755876::t_45438c4aa15528 8
+  s_cb7a74a3755876::t_d9b04c4af4bd6e 9
+  s_1b97024b49f04c::t_11d0fcd498f966 5-7,10-14,92-94
+src/preset/index.d.ts
+  s_cb7a74a3755876::t_d2692a66fd9040 20,34
+  s_cb7a74a3755876::t_42c63952c96503 3,14,16-19,21,24,26-33
+  s_cb7a74a3755876::t_84d247516de49f 25
+  s_1b97024b49f04c::t_11d0fcd498f966 15,22-23
+  s_5bc2e429fe9fc1::t_3cb05c37502858 35
+CONTRIBUTING.md
+  s_1b97024b49f04c::t_11d0fcd498f966 88-92
+test/policy/load.test.js
+  s_cb7a74a3755876::t_42c63952c96503 81,97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "08450ac48424f44d642b5fea14d3842c9ea26a95",
+  "prompts": {},
+  "sessions": {
+    "s_1b97024b49f04c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a1340e-92d9-7062-a868-681913548d7d",
+        "model": "gpt-6.1-sol"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    },
+    "s_5bc2e429fe9fc1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "36e4f985-b802-47d4-9ffd-1bc0fc775132",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    },
+    "s_cb7a74a3755876": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cfb74c35-6eff-4871-a9d8-4a68f86b20e2",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Ivan Buryak <ivan.buryak@gmail.com>"
+    }
+  }
+}
