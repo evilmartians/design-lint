@@ -199,7 +199,6 @@ const OPTIONS = {
  * system is a fact about the rules rather than about the fixture.
  */
 const RESOLVED = {
-  "no-ad-hoc-heading": { designSystem },
   "no-arbitrary-radius": { designSystem },
   "no-arbitrary-typography": { designSystem },
   "no-component-color-override": { designSystem: semanticDesignSystem },

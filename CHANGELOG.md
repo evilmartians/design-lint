@@ -2,7 +2,7 @@
 
 ## 0.2.0
 
-Three new rules are enabled by `designLint()`. Upgrading can fail a build that passed
+Two new rules are enabled by `designLint()`. Upgrading can fail a build that passed
 on 0.1.x. To adopt them gradually, set individual rules to `"off"` or `"warn"` in your
 config, or record existing violations with `oxlint --suppress-all`.
 
@@ -13,11 +13,6 @@ config, or record existing violations with `oxlint --suppress-all`.
 - `no-arbitrary-radius` reports arbitrary corner radii, such as `rounded-[6px]`,
   `rounded-tl-[4px]`, and `[border-radius:6px]`. CSS variable references and CSS-wide
   keywords are allowed, including `rounded-[calc(var(--radius)-2px)]` and `rounded-[inherit]`.
-- `no-ad-hoc-heading` reports `<h1>`–`<h6>` elements with font size or font weight classes
-  but no heading class, such as `<h2 className="text-xl">`. It also reports typography
-  overrides on any element with a heading class, such as `heading-1 font-bold` or
-  `heading-2 md:text-3xl`. The `headingClasses` option defines the heading class patterns
-  and defaults to `["heading-*"]`.
 
 ## 0.1.5
 

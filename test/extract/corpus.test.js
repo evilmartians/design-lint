@@ -31,7 +31,7 @@ const SWEEP_RULES = new Set([
   "token-constraints",
 ]);
 
-const ELEMENT_RULES = new Set(["no-ad-hoc-heading", "no-component-color-override", "no-useless-hover"]);
+const ELEMENT_RULES = new Set(["no-component-color-override", "no-useless-hover"]);
 
 const meta = {
   type: "problem",

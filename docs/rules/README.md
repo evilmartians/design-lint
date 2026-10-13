@@ -15,7 +15,6 @@ Design Lint keeps product code aligned with a token-based design system. These r
 | [`no-component-color-override`](./no-component-color-override.md) | Reports color classes passed to design-system components through `className` |
 | [`no-arbitrary-typography`](./no-arbitrary-typography.md) | Reports arbitrary font sizes, font weights, and letter spacing such as `text-[13px]` |
 | [`no-arbitrary-radius`](./no-arbitrary-radius.md) | Reports arbitrary corner radii such as `rounded-[6px]` |
-| [`no-ad-hoc-heading`](./no-ad-hoc-heading.md) | Reports headings styled without heading classes, and overrides to heading typography |
 
 ## The shared idea
 
