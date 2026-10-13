@@ -11,7 +11,7 @@ npm test
 | --- | --- |
 | `src/preset/` | `designLint()`, the factory a consumer calls from `oxlint.config.ts`. It performs the package's one filesystem read: it loads the consumer's token stylesheets, resolves the Tailwind design system and the token set, and hands them to the plugin. |
 | `src/oxlint.js` | The plugin Oxlint loads through `jsPlugins`. It binds what the factory resolved to the rules that need it. |
-| `src/rules/` | The nine rules. |
+| `src/rules/` | The rules, one file each, and `arbitrary-value.js`, which two of them share. |
 | `src/cli.js`, `src/report/` | `design-lint report`: reads the consumer's Oxlint config, asks Oxlint which files it lints, and counts what is switched off. |
 | `src/extract/` | Class-string extraction. A broad sweep of every string in the file for the token rules; a precise walk of one element's `className` for the JSX rules. |
 | `src/policy/` | What several rules share: variant parsing, the class tokenizer, colour matching, and the questions asked of the design system and the token set. Exported as `/policy`. |
@@ -28,6 +28,17 @@ project's opinion — which tokens may go on which utilities, which palette fami
 which semantic names, which components own their own colour, whether `dark:` is banned —
 is a rule option with a recommended default. A project shaped differently configures a
 rule rather than forking one.
+
+### No heuristics decide whether a rule reports
+
+A rule reports according to its configured options. It does not disable itself because a
+project appears to lack the classes it expects, or infer the project's vocabulary from
+its theme. The vocabulary is a rule option with a default. A project that needs different
+class names configures the option; a project that does not want the reports disables the
+rule.
+
+Rules also report independently. Each behaves the same whether it runs alone or alongside
+other rules, even when more than one rule reports the same class.
 
 ### Only the factory reads files
 
@@ -74,7 +85,8 @@ in `docs/rules/` too.
 
 A new rule needs all three: a contract, a guide, and a location fixture in
 `test/harness/locations.test.js` — a test fails without the fixture. New rules ship
-disabled; the full versioning policy is in [`CHANGELOG.md`](./CHANGELOG.md).
+disabled and are turned on only in a breaking release — before 1.0, a minor bump. The
+full versioning policy is in [`CHANGELOG.md`](./CHANGELOG.md).
 
 ## Trying a change in a real project
 

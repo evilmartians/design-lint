@@ -11,6 +11,9 @@
  * and `no-useless-hover` decides interactivity from the element, not from the theme.
  */
 export const RESOLVED_INPUTS = {
+  "no-ad-hoc-heading": ({ designSystem }) => ({ designSystem }),
+  "no-arbitrary-radius": ({ designSystem }) => ({ designSystem }),
+  "no-arbitrary-typography": ({ designSystem }) => ({ designSystem }),
   "no-component-color-override": ({ designSystem }) => ({ designSystem }),
   "no-dark-variant": ({ designSystem }) => ({ designSystem }),
   "no-opacity-modifier": ({ designSystem }) => ({ designSystem }),
